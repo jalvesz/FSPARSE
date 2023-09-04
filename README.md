@@ -61,6 +61,8 @@ Inspiration
 ===========
 [Efficient Sparse Matrix-Vector Multiplication on cuda](https://www.nvidia.com/docs/io/66889/nvr-2008-004.pdf)
 
+[gsl sparse matrices](https://www.gnu.org/software/gsl/doc/html/spmatrix.html)
+
 Authors and contributors  
 ========================
 
