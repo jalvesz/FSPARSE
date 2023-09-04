@@ -22,6 +22,11 @@ module matvec_mod
         module procedure matvec_csr_2d_sp
         module procedure matvec_csr_2d_dp
 
+        module procedure matvec_csc_1d_sp
+        module procedure matvec_csc_1d_dp
+        module procedure matvec_csc_2d_sp
+        module procedure matvec_csc_2d_dp
+
         module procedure matvec_ell_1d_sp
         module procedure matvec_ell_1d_dp
         module procedure matvec_ell_2d_sp
@@ -79,6 +84,31 @@ module matvec_mod
         integer, parameter      :: wp = real64
         type(CSRr64_t), intent(in) :: matrix
         include 'matvec_csr_2d.inc'
+    end subroutine
+
+    !! matvec_csc
+    subroutine matvec_csc_1d_sp(matrix,vec_x,vec_y)
+        integer, parameter      :: wp = real32
+        type(CSCr32_t), intent(in) :: matrix
+        include 'matvec_csc_1d.inc'
+    end subroutine
+
+    subroutine matvec_csc_1d_dp(matrix,vec_x,vec_y)
+        integer, parameter      :: wp = real64
+        type(CSCr64_t), intent(in) :: matrix
+        include 'matvec_csc_1d.inc'
+    end subroutine
+
+    subroutine matvec_csc_2d_sp(matrix,vec_x,vec_y)
+        integer, parameter      :: wp = real32
+        type(CSCr32_t), intent(in) :: matrix
+        include 'matvec_csc_2d.inc'
+    end subroutine
+
+    subroutine matvec_csc_2d_dp(matrix,vec_x,vec_y)
+        integer, parameter      :: wp = real64
+        type(CSCr64_t), intent(in) :: matrix
+        include 'matvec_csc_2d.inc'
     end subroutine
 
     !! matvec_ell

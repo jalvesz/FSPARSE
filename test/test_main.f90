@@ -4,6 +4,7 @@ implicit none
 
 call test_coo()
 call test_csr()
+call test_csc()
 call test_ell()
 
 end program

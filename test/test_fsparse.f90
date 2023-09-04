@@ -49,6 +49,23 @@ module test_fsparse
         
     end subroutine
 
+    subroutine test_csc()
+        type(CSCr64_t) :: CSC
+        real(dp), allocatable :: vec_x(:)
+        real(dp), allocatable :: vec_y(:)
+
+        call CSC%malloc(4,5,10)
+        CSC%data(:)   = dble([9,4,4,7,8,-1,5,8,6,-3])
+        CSC%row(:)    = [1,2,4,2,3,3,4,3,4,1]
+        CSC%colptr(:) = [1,4,6,8,10,11]
+        
+        allocate( vec_x(5) , source = 1._dp )
+        allocate( vec_y(4) , source = 0._dp )
+        call matvec( CSC , vec_x , vec_y )
+        print *, vec_y
+        
+    end subroutine
+
     subroutine test_ell()
         type(ELLr32_t) :: ELL
         real(sp), allocatable :: vec_x(:)
