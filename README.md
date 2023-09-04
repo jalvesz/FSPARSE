@@ -1,3 +1,5 @@
+![fsparse](media/logo.png)
+
 FSPARSE: Fortran Sparse Gallery library
 =======================================
 
