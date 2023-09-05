@@ -1,5 +1,5 @@
 !---------------------------------------------------
-! Copyright 2023-present Transvalor S.A.
+! Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
 !
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
@@ -36,14 +36,10 @@ module matrix_gallery
   
     type, extends(COO_t) :: COOr32_t
       real(sp), allocatable :: data(:)
-    contains 
-      procedure :: from_dense => coo_from_dense_sp
     end type
   
     type, extends(COO_t) :: COOr64_t
       real(dp), allocatable :: data(:)
-    contains 
-      procedure :: from_dense => coo_from_dense_dp
     end type
   
     !! CSR: Compressed sparse row or Yale format
@@ -266,56 +262,4 @@ module matrix_gallery
       end select
   end subroutine
 
-  subroutine coo_from_dense_sp( self , dense )
-    integer, parameter   :: wp = sp
-    class(COOr32_t)      :: self
-    real(wp), intent(in) :: dense(:,:)
-    integer :: num_rows, num_cols, nnz
-    integer :: i, j, idx
-
-    num_rows = size(dense,dim=1)
-    num_cols = size(dense,dim=2)
-    nnz = count( abs(dense) > 0._wp )
-
-    call self%malloc(num_rows,num_cols,nnz)
-
-    idx = 1
-    do i = 1, num_rows
-        do j = 1, num_cols
-            if(abs(dense(i,j)) < tiny(1._wp)) cycle
-            self%index(1,idx) = i
-            self%index(2,idx) = j
-            self%data(idx) = dense(i,j)
-            idx = idx + 1
-        end do
-    end do
-
-  end subroutine
-
-  subroutine coo_from_dense_dp( self , dense )
-    integer, parameter   :: wp = dp
-    class(COOr64_t)      :: self
-    real(wp), intent(in) :: dense(:,:)
-    integer :: num_rows, num_cols, nnz
-    integer :: i, j, idx
-
-    num_rows = size(dense,dim=1)
-    num_cols = size(dense,dim=2)
-    nnz = count( abs(dense) > 0._wp )
-
-    call self%malloc(num_rows,num_cols,nnz)
-
-    idx = 1
-    do i = 1, num_rows
-        do j = 1, num_cols
-            if(abs(dense(i,j)) < tiny(1._wp)) cycle
-            self%index(1,idx) = i
-            self%index(2,idx) = j
-            self%data(idx) = dense(i,j)
-            idx = idx + 1
-        end do
-    end do
-
-  end subroutine
-  
   end module matrix_gallery

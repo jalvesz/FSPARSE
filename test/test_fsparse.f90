@@ -18,7 +18,7 @@ module test_fsparse
                          0.0,0.0,8.0,6.0,&
                          -3.0,0.0,0.0,0.0],[4,5]) )
         
-        call COO%from_dense( dense )
+        call dense2coo( dense , COO )
         
         allocate( vec_x(5) , source = 1._sp )
         allocate( vec_y(4) , source = 0._sp )
@@ -29,7 +29,7 @@ module test_fsparse
         vec_y = 0._sp
         call matvec( COO , vec_x, vec_y )
         print *, vec_y ! 6.00000000       11.0000000       15.0000000       15.0000000
-
+        
     end subroutine
 
     subroutine test_csr()
