@@ -280,8 +280,8 @@ module matrix_gallery
     call self%malloc(num_rows,num_cols,nnz)
 
     idx = 1
-    do j = 1, num_cols
-        do i = 1, num_rows
+    do i = 1, num_rows
+        do j = 1, num_cols
             if(abs(dense(i,j)) < tiny(1._wp)) cycle
             self%index(1,idx) = i
             self%index(2,idx) = j
@@ -306,8 +306,8 @@ module matrix_gallery
     call self%malloc(num_rows,num_cols,nnz)
 
     idx = 1
-    do j = 1, num_cols
-        do i = 1, num_rows
+    do i = 1, num_rows
+        do j = 1, num_cols
             if(abs(dense(i,j)) < tiny(1._wp)) cycle
             self%index(1,idx) = i
             self%index(2,idx) = j
