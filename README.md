@@ -65,6 +65,8 @@ Inspiration
 
 [gsl sparse matrices](https://www.gnu.org/software/gsl/doc/html/spmatrix.html)
 
+[Calcul Scientifique Parallèle](https://www.dunod.com/sciences-techniques/calcul-scientifique-parallele-cours-exemples-avec-openmp-et-mpi-exercices-0)
+
 Authors and contributors  
 ========================
 
