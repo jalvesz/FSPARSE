@@ -7,6 +7,7 @@
 module conversions
     use iso_fortran_env
     use matrix_gallery
+    use sparse_sort
     implicit none
     
     interface dense2coo
@@ -26,7 +27,7 @@ module conversions
     end interface
 
 contains
-    
+
     subroutine dense2coo_sp(dense,COO)
         integer, parameter :: wp = real32
         real(wp), intent(in) :: dense(:,:)
@@ -110,6 +111,7 @@ contains
 
         associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
         CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
+
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0

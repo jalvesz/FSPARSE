@@ -5,6 +5,9 @@
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
 module matrix_gallery
+    
+    !! This module provides the base sparse matrix types
+
     use iso_fortran_env, only: sp=>real32, dp=>real64
     implicit none
     private
@@ -28,18 +31,18 @@ module matrix_gallery
   
     !! COO: COOrdinates compresed format
     type, extends(sparse_t) :: COO_t
-      logical               :: isOrdered = .false.
-      integer, allocatable  :: index(:,:)
+      logical               :: isOrdered = .false. !! wether the matrix is ordered or not
+      integer, allocatable  :: index(:,:) !! Matrix coordinates index(2,nnz)
     contains
       procedure :: malloc => malloc_coo
     end type
   
     type, extends(COO_t) :: COOr32_t
-      real(sp), allocatable :: data(:)
+      real(sp), allocatable :: data(:) !! single precision values
     end type
   
     type, extends(COO_t) :: COOr64_t
-      real(dp), allocatable :: data(:)
+      real(dp), allocatable :: data(:) !! double precision values
     end type
   
     !! CSR: Compressed sparse row or Yale format
