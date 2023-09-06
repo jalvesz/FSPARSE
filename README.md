@@ -9,6 +9,13 @@ This project is very much a work in progress, contributions are wellcome.
 
 Available Matrices
 ==================
+| Matrix type | no data | float | double | complex float | complex double |
+|-------------|---------|-------|--------|---------------|----------------|
+| COO | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
+| CSR | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
+| CSC | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
+| ELL | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
+
 COO: COordinate Sparse format
 
 CSR: Compressed Sparse Row format
@@ -17,13 +24,32 @@ CSC: Compressed Sparse Column format
 
 ELL: ELLPACK
 
-All matrices come currently in three flavors:
+Available Kernels
+==================
+### Conversion
+Conversion subroutines follow the naming pattern _sourcetype2targettype_m ex:
+```fortran
+call dense2coo( dense , coo )
+```
+| Matrix | dense | COO   | CSR   | CSC   | ELL   |
+|--------|-------|-------|-------|-------|-------|
+| dense  |       | ?    |       |       |       |
+| COO    | ?    |       |       |       |       |
+| CSR    |       | ?    |       |       |       |
+| CSC    |       |       |       |       |       |
+| ELL    |       |       |       |       |       |
 
-type(COO_t) : no data buffer (only index targeting graph manipulation)
-
-type(COOr32_t) : simple precision data buffer
-
-type(COOr64_t) : double precision data buffer
+### Sparse Matrix-Vector product
+(availbale) Matrix vector products are interfaced by the procedure
+```fortran
+call matvec( Mat , vec_x , vec_y ) ! vec_y = Mat * vec_x
+```
+| Matrix | float | double | symmetric float | symmetric double |
+|--------|-------|--------|-----------------|------------------|
+| COO    | ? | ? | ? | ? |
+| CSR    | ? | ? | ? | ? |
+| CSC    | ? | ? | ? | ? |
+| ELL    | ? | ? | ? | ? |
 
 A taste of FSPARSE
 ==================
