@@ -14,6 +14,11 @@ module conversions
         module procedure dense2coo_dp
     end interface
 
+    interface coo2dense
+        module procedure coo2dense_sp
+        module procedure coo2dense_dp
+    end interface
+
     interface coo2csr
         module procedure coo2csr_ordered
         module procedure coo2csr_ordered_sp
@@ -21,7 +26,7 @@ module conversions
     end interface
 
 contains
-
+    
     subroutine dense2coo_sp(dense,COO)
         integer, parameter :: wp = real32
         real(wp), intent(in) :: dense(:,:)
@@ -31,7 +36,7 @@ contains
 
         num_rows = size(dense,dim=1)
         num_cols = size(dense,dim=2)
-        nnz = count( abs(dense) > 0._wp )
+        nnz = count( abs(dense) > tiny(1._wp) )
 
         call COO%malloc(num_rows,num_cols,nnz)
 
@@ -45,6 +50,7 @@ contains
                 idx = idx + 1
             end do
         end do
+        COO%isOrdered = .true.
     end subroutine
 
     subroutine dense2coo_dp(dense,COO)
@@ -56,7 +62,7 @@ contains
 
         num_rows = size(dense,dim=1)
         num_cols = size(dense,dim=2)
-        nnz = count( abs(dense) > 0._wp )
+        nnz = count( abs(dense) > tiny(1._wp) )
 
         call COO%malloc(num_rows,num_cols,nnz)
 
@@ -70,6 +76,29 @@ contains
                 idx = idx + 1
             end do
         end do
+        COO%isOrdered = .true.
+    end subroutine
+
+    subroutine coo2dense_sp(COO,dense)
+        integer, parameter :: wp = real32
+        type(COOr32_t), intent(in) :: COO
+        real(wp), intent(inout) :: dense(:,:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+    subroutine coo2dense_dp(COO,dense)
+        integer, parameter :: wp = real64
+        type(COOr64_t), intent(in) :: COO
+        real(wp), intent(inout) :: dense(:,:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
+        end do
     end subroutine
 
     subroutine coo2csr_ordered(COO,CSR)
@@ -77,10 +106,10 @@ contains
         !! under the hypothesis that the COO is already ordered.
         type(COO_t), intent(in)    :: COO
         type(CSR_t), intent(inout) :: CSR
-        integer :: i, nnz, num_rows, num_cols, base
+        integer :: i
 
-        base=COO%base; nnz=COO%nnz; num_rows=COO%N; num_cols=COO%M
-        CSR%base = base; CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols
+        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
+        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -96,6 +125,7 @@ contains
         do i = 1, num_rows
             CSR%rowptr( i+1 ) = CSR%rowptr( i+1 ) + CSR%rowptr( i )
         end do
+        end associate
     end subroutine
 
     subroutine coo2csr_ordered_sp(COO,CSR)
@@ -103,10 +133,10 @@ contains
         !! under the hypothesis that the COO is already ordered.
         type(COOr32_t), intent(in)    :: COO
         type(CSRr32_t), intent(inout) :: CSR
-        integer :: i, nnz, num_rows, num_cols, base
+        integer :: i
 
-        nnz=COO%nnz; num_rows=COO%N; num_cols=COO%M; base=COO%base
-        CSR%base = base; CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols
+        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
+        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -124,6 +154,7 @@ contains
         do i = 1, num_rows
             CSR%rowptr( i+1 ) = CSR%rowptr( i+1 ) + CSR%rowptr( i )
         end do
+        end associate
     end subroutine
 
     subroutine coo2csr_ordered_dp(COO,CSR)
@@ -131,10 +162,10 @@ contains
         !! under the hypothesis that the COO is already ordered.
         type(COOr64_t), intent(in)    :: COO
         type(CSRr64_t), intent(inout) :: CSR
-        integer :: i, nnz, num_rows, num_cols, base
+        integer :: i
 
-        nnz=COO%nnz; num_rows=COO%N; num_cols=COO%M; base=COO%base
-        CSR%base = base; CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols
+        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
+        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -152,6 +183,7 @@ contains
         do i = 1, num_rows
             CSR%rowptr( i+1 ) = CSR%rowptr( i+1 ) + CSR%rowptr( i )
         end do
+        end associate
     end subroutine
     
 end module conversions
