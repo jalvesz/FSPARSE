@@ -11,10 +11,10 @@ Available Matrices
 ==================
 | Matrix type | no data | float | double | complex float | complex double |
 |-------------|---------|-------|--------|---------------|----------------|
-| COO | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
-| CSR | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
-| CSC | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
-| ELL | `COO_t` | `COOr32_t` | `COOr64_t` | ? | ? |
+| COO | `COO_t` | `COOr32_t` | `COOr64_t` | ❌ | ❌ |
+| CSR | `COO_t` | `COOr32_t` | `COOr64_t` | ❌ | ❌ |
+| CSC | `COO_t` | `COOr32_t` | `COOr64_t` | ❌ | ❌ |
+| ELL | `COO_t` | `COOr32_t` | `COOr64_t` | ❌ | ❌ |
 
 COO: COordinate Sparse format
 
