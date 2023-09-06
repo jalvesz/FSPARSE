@@ -1,7 +1,7 @@
 MIT License
 
 From Transvalor S.A.
-Copyright (c) 2023-present José R. Alves Z.
+Copyright (c) 2023-present JosÃ© R. Alves Z.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

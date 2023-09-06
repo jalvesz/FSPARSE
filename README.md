@@ -33,9 +33,9 @@ call dense2coo( dense , coo )
 ```
 | Matrix | dense | COO   | CSR   | CSC   | ELL   |
 |--------|-------|-------|-------|-------|-------|
-| dense  |       | ?    |       |       |       |
-| COO    | ?    |       |       |       |       |
-| CSR    |       | ?    |       |       |       |
+| dense  |       | ✅    |       |       |       |
+| COO    | ✅    |       |       |       |       |
+| CSR    |       | ✅    |       |       |       |
 | CSC    |       |       |       |       |       |
 | ELL    |       |       |       |       |       |
 
@@ -46,10 +46,10 @@ call matvec( Mat , vec_x , vec_y ) ! vec_y = Mat * vec_x
 ```
 | Matrix | float | double | symmetric float | symmetric double |
 |--------|-------|--------|-----------------|------------------|
-| COO    | ? | ? | ? | ? |
-| CSR    | ? | ? | ? | ? |
-| CSC    | ? | ? | ? | ? |
-| ELL    | ? | ? | ? | ? |
+| COO    | ✅ | ✅ | ✅ | ✅ |
+| CSR    | ✅ | ✅ | ❌ | ❌ |
+| CSC    | ✅ | ✅ | ❌ | ❌ |
+| ELL    | ✅ | ✅ | ❌ | ❌ |
 
 A taste of FSPARSE
 ==================
@@ -91,12 +91,12 @@ Inspiration
 
 [gsl sparse matrices](https://www.gnu.org/software/gsl/doc/html/spmatrix.html)
 
-[Calcul Scientifique Parall�le](https://www.dunod.com/sciences-techniques/calcul-scientifique-parallele-cours-exemples-avec-openmp-et-mpi-exercices-0)
+[Calcul Scientifique Parallèle](https://www.dunod.com/sciences-techniques/calcul-scientifique-parallele-cours-exemples-avec-openmp-et-mpi-exercices-0)
 
 Authors and contributors  
 ========================
 
-+   [Jos� R. Alves Z.](https://www.researchgate.net/profile/Jose-Alves-25)  
++   [José R. Alves Z.](https://www.researchgate.net/profile/Jose-Alves-25)  
     +   Mechanical Engineer, Researcher, Scientific Software Developer
 
 Acknowledgement

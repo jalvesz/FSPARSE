@@ -1,5 +1,5 @@
 !---------------------------------------------------
-! Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
+! Copyright 2023-present Transvalor S.A. (JosÃ© R. Alves Z.)
 !
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
