@@ -109,8 +109,8 @@ contains
         type(CSR_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
-        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
 
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
@@ -137,8 +137,8 @@ contains
         type(CSRr32_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
-        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -166,8 +166,8 @@ contains
         type(CSRr64_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%N, num_cols=>COO%M, base=>COO%base )
-        CSR%NNZ = nnz; CSR%N = num_rows; CSR%M = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0

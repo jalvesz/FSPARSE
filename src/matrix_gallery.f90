@@ -5,7 +5,7 @@
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
 module matrix_gallery
-    
+
     !! This module provides the base sparse matrix types
 
     use iso_fortran_env, only: sp=>real32, dp=>real64
@@ -23,8 +23,8 @@ module matrix_gallery
     ! -- Classes
     type, abstract :: sparse_t
       integer :: base = 1 !! index base = 0 for (C) or 1 (Fortran)
-      integer :: N    = 0 !! number of rows
-      integer :: M    = 0 !! number of columns
+      integer :: nrows= 0 !! number of rows
+      integer :: ncols= 0 !! number of columns
       integer :: NNZ  = 0 !! number of non-zero values
       integer :: sym  = k_NOSYMMETRY !! assumed storage symmetry
     end type
@@ -105,8 +105,8 @@ module matrix_gallery
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
   
-      self%N = num_rows
-      self%M = num_cols
+      self%nrows = num_rows
+      self%ncols = num_cols
       self%NNZ = nnz
   
       if(.not.allocated(self%index)) then
@@ -144,8 +144,8 @@ module matrix_gallery
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
   
-      self%N = num_rows
-      self%M = num_cols
+      self%nrows = num_rows
+      self%ncols = num_cols
       self%NNZ = nnz
   
       if(.not.allocated(self%col)) then
@@ -190,8 +190,8 @@ module matrix_gallery
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
   
-      self%N = num_rows
-      self%M = num_cols
+      self%nrows = num_rows
+      self%ncols = num_cols
       self%NNZ = nnz
   
       if(.not.allocated(self%row)) then
@@ -236,8 +236,8 @@ module matrix_gallery
       real(sp), allocatable :: stemp(:,:)
       real(dp), allocatable :: dtemp(:,:)
   
-      self%N = num_rows
-      self%M = num_cols
+      self%nrows = num_rows
+      self%ncols = num_cols
       self%K = num_nz_rows
   
       if(.not.allocated(self%index)) then

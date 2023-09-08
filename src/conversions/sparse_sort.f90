@@ -291,7 +291,7 @@ module sparse_sort
         integer, allocatable :: itemp(:,:)
 
         if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%N, COO%M)
+            call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
 
             allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
             call move_alloc( itemp , COO%index )
@@ -307,7 +307,7 @@ module sparse_sort
         real(wp), allocatable :: rtemp(:)
 
         if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%N, COO%M)
+            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
 
             allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
             call move_alloc( itemp , COO%index )
@@ -326,7 +326,7 @@ module sparse_sort
         real(wp), allocatable :: rtemp(:)
 
         if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%N, COO%M)
+            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
 
             allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
             call move_alloc( itemp , COO%index )
