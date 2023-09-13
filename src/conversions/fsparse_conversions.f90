@@ -4,10 +4,10 @@
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
-module conversions
+module fsparse_conversions
     use iso_fortran_env
-    use matrix_gallery
-    use sparse_sort
+    use fsparse_matrix_gallery
+    use fsparse_sort
     implicit none
     
     interface dense2coo
@@ -188,4 +188,4 @@ contains
         end associate
     end subroutine
     
-end module conversions
+end module fsparse_conversions

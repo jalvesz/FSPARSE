@@ -6,8 +6,8 @@
 !---------------------------------------------------
 module fsparse
   !! User API: by loading this module all matrix types and methods are directly referenced
-  use matrix_gallery
-  use matvec_mod
-  use sparse_sort
-  use conversions
+  use fsparse_matrix_gallery
+  use fsparse_matvec
+  use fsparse_sort
+  use fsparse_conversions
 end module fsparse

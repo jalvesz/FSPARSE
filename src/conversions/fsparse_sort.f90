@@ -4,9 +4,9 @@
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
-module sparse_sort
+module fsparse_sort
     use iso_fortran_env
-    use matrix_gallery
+    use fsparse_matrix_gallery
     implicit none
     private
 
@@ -337,4 +337,4 @@ module sparse_sort
             COO%isOrdered = .true.
         end if
     end subroutine
-end module
+end module fsparse_sort

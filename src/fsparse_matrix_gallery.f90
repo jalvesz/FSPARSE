@@ -4,7 +4,7 @@
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
-module matrix_gallery
+module fsparse_matrix_gallery
 
     !! This module provides the base sparse matrix types
 
@@ -265,4 +265,4 @@ module matrix_gallery
       end select
   end subroutine
 
-  end module matrix_gallery
+  end module fsparse_matrix_gallery

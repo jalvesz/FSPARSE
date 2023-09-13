@@ -4,8 +4,8 @@
 ! Use of this source code is governed by a MIT
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
-module matvec_mod
-    use matrix_gallery
+module fsparse_matvec
+    use fsparse_matrix_gallery
     use spmv_kernels
     use iso_fortran_env
     implicit none
@@ -136,4 +136,4 @@ module matvec_mod
         include 'matvec_ell_2d.inc'
     end subroutine
 
-end module matvec_mod
+end module fsparse_matvec
