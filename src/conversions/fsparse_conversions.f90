@@ -26,6 +26,12 @@ module fsparse_conversions
         module procedure coo2csr_ordered_dp
     end interface
 
+    interface csr2coo
+        module procedure csr2coo
+        module procedure csr2coo_sp
+        module procedure csr2coo_dp
+    end interface
+
 contains
 
     subroutine dense2coo_sp(dense,COO)
@@ -186,6 +192,69 @@ contains
             CSR%rowptr( i+1 ) = CSR%rowptr( i+1 ) + CSR%rowptr( i )
         end do
         end associate
+    end subroutine
+
+    subroutine csr2coo(CSR,COO)
+        !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
+        type(CSR_t), intent(in)    :: CSR
+        type(COO_t), intent(inout) :: COO
+        integer :: i, j
+
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+
+        if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
+        
+        do i = 1, CSR%nrows
+            do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                COO%index(1:2,j) = [i,CSR%col(j)]
+            end do
+        end do
+    end subroutine
+
+    subroutine csr2coo_sp(CSR,COO)
+        !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
+        type(CSRr32_t), intent(in)    :: CSR
+        type(COOr32_t), intent(inout) :: COO
+        integer :: i, j
+
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+
+        if( .not.allocated(COO%data) ) then
+            allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
+        else 
+            COO%data(1:CSR%NNZ) = CSR%data(1:CSR%NNZ)
+        end if
+
+        if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
+        
+        do i = 1, CSR%nrows
+            do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                COO%index(1:2,j) = [i,CSR%col(j)]
+            end do
+        end do
+    end subroutine
+
+    subroutine csr2coo_dp(CSR,COO)
+        !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
+        type(CSRr64_t), intent(in)    :: CSR
+        type(COOr64_t), intent(inout) :: COO
+        integer :: i, j
+
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+
+        if( .not.allocated(COO%data) ) then
+            allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
+        else 
+            COO%data(1:CSR%NNZ) = CSR%data(1:CSR%NNZ)
+        end if
+
+        if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
+
+        do i = 1, CSR%nrows
+            do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                COO%index(1:2,j) = [i,CSR%col(j)]
+            end do
+        end do
     end subroutine
     
 end module fsparse_conversions

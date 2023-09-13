@@ -34,7 +34,7 @@ call dense2coo( dense , coo )
 | Matrix | dense | COO   | CSR   | CSC   | ELL   |
 |--------|-------|-------|-------|-------|-------|
 | dense  |       | ✅    |       |       |       |
-| COO    | ✅    |       |       |       |       |
+| COO    | ✅    |       | ✅   |       |       |
 | CSR    |       | ✅    |       |       |       |
 | CSC    |       |       |       |       |       |
 | ELL    |       |       |       |       |       |
