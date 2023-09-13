@@ -48,7 +48,7 @@ call matvec( Mat , vec_x , vec_y ) ! vec_y = Mat * vec_x
 | Matrix | float | double | symmetric float | symmetric double |
 |--------|-------|--------|-----------------|------------------|
 | COO    | ✅ | ✅ | ✅ | ✅ |
-| CSR    | ✅ | ✅ | ❌ | ❌ |
+| CSR    | ✅ | ✅ | ✅ | ✅ |
 | CSC    | ✅ | ✅ | ❌ | ❌ |
 | ELL    | ✅ | ✅ | ❌ | ❌ |
 
