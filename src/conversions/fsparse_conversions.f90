@@ -115,8 +115,9 @@ contains
         type(CSR_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
-        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols
+        CSR%base = base; CSR%sym = sym
 
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
@@ -143,8 +144,10 @@ contains
         type(CSRr32_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
-        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols
+        CSR%base = base; CSR%sym = sym
+
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -172,8 +175,10 @@ contains
         type(CSRr64_t), intent(inout) :: CSR
         integer :: i
 
-        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base )
-        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols; CSR%base = base
+        associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
+        CSR%NNZ = nnz; CSR%nrows = num_rows; CSR%ncols = num_cols
+        CSR%base = base; CSR%sym = sym
+
         if( allocated(CSR%col) ) then
             CSR%col(1:nnz)  = COO%index(2,1:nnz)
             CSR%rowptr(1:num_rows) = 0
@@ -200,7 +205,8 @@ contains
         type(COO_t), intent(inout) :: COO
         integer :: i, j
 
-        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
+        COO%base = CSR%base; COO%sym = CSR%sym
 
         if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
         
@@ -217,7 +223,8 @@ contains
         type(COOr32_t), intent(inout) :: COO
         integer :: i, j
 
-        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
+        COO%base = CSR%base; COO%sym = CSR%sym
 
         if( .not.allocated(COO%data) ) then
             allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
@@ -240,7 +247,8 @@ contains
         type(COOr64_t), intent(inout) :: COO
         integer :: i, j
 
-        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols; COO%base = CSR%base
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
+        COO%base = CSR%base; COO%sym = CSR%sym
 
         if( .not.allocated(COO%data) ) then
             allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
