@@ -16,7 +16,8 @@ module test_fsparse
             new_unittest('coo2ordered', test_coo2ordered), &
             new_unittest('csr', test_csr), &
             new_unittest('csc', test_csc), &
-            new_unittest('ell', test_ell)  &
+            new_unittest('ell', test_ell),  &
+            new_unittest('symmetries', test_symmetries) &
         ]
     end subroutine
 
@@ -156,6 +157,47 @@ module test_fsparse
         call check(error, all(vec_y == [6.0,11.0,15.0,15.0]) )
         if (allocated(error)) return
         
+    end subroutine
+
+    subroutine test_symmetries(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
+
+        real(sp), allocatable :: dense(:,:)
+        type(COOr32_t) :: COO
+        type(CSRr32_t) :: CSR
+        real(sp), allocatable :: vec_x(:)
+        real(sp), allocatable :: vec_y1(:), vec_y2(:), vec_y3(:)
+
+        allocate( vec_x(4) , source = 1._sp )
+        allocate( vec_y1(4) , source = 0._sp )
+        allocate( vec_y2(4) , source = 0._sp )
+        allocate( vec_y3(4) , source = 0._sp )
+
+        allocate( dense(4,4) , source = &
+                reshape([1.0,0.0,0.0,0.0, &
+                         2.0,1.0,0.0,0.0, &
+                         0.0,2.0,1.0,0.0,&
+                         0.0,0.0,2.0,1.0],[4,4]) )
+
+        call dense2coo( dense , COO )
+        COO%sym = k_SYMTRISUP
+
+        dense(2,1) = 2.0; dense(3,2) = 2.0; dense(4,3) = 2.0
+        vec_y1 = matmul( dense, vec_x )
+
+        call check(error, all(vec_y1 == [3.0,5.0,5.0,3.0]) )
+        if (allocated(error)) return
+
+        call matvec( COO , vec_x, vec_y2 )
+        call check(error, all(vec_y1 == vec_y2) )
+        if (allocated(error)) return
+
+        call coo2csr(COO, CSR)
+        call matvec( CSR , vec_x, vec_y3 )
+        call check(error, all(vec_y1 == vec_y3) )
+        if (allocated(error)) return
+
     end subroutine
 
 end module test_fsparse
