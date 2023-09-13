@@ -1,15 +1,33 @@
 module test_fsparse
-    use iso_fortran_env, only: sp=>real32, dp=>real64
+    use, intrinsic :: iso_fortran_env, only: sp=>real32, dp=>real64
+    use testdrive, only: new_unittest, unittest_type, error_type, check
     use fsparse
     implicit none
     
     contains
-    
-    subroutine test_coo()
+
+    !> Collect all exported unit tests
+    subroutine collect_suite(testsuite)
+        !> Collection of tests
+        type(unittest_type), allocatable, intent(out) :: testsuite(:)
+
+        testsuite = [ &
+            new_unittest('coo', test_coo), &
+            new_unittest('coo2ordered', test_coo2ordered), &
+            new_unittest('csr', test_csr), &
+            new_unittest('csc', test_csc), &
+            new_unittest('ell', test_ell)  &
+        ]
+    end subroutine
+
+    subroutine test_coo(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
+
         real(sp), allocatable :: dense(:,:)
         type(COOr32_t) :: COO
         real(sp), allocatable :: vec_x(:)
-        real(sp), allocatable :: vec_y(:)
+        real(sp), allocatable :: vec_y1(:), vec_y2(:)
 
         allocate( dense(4,5) , source = &
                 reshape([9.0,4.0,0.0,4.0, &
@@ -21,18 +39,59 @@ module test_fsparse
         call dense2coo( dense , COO )
         
         allocate( vec_x(5) , source = 1._sp )
-        allocate( vec_y(4) , source = 0._sp )
-        
-        vec_y = matmul( dense, vec_x )
-        print *, vec_y ! 6.00000000       11.0000000       15.0000000       15.0000000
+        allocate( vec_y1(4) , source = 0._sp )
+        allocate( vec_y2(4) , source = 0._sp )
 
-        vec_y = 0._sp
-        call matvec( COO , vec_x, vec_y )
-        print *, vec_y ! 6.00000000       11.0000000       15.0000000       15.0000000
+        vec_y1 = matmul( dense, vec_x )
+        
+        call check(error, all(vec_y1 == [6.0,11.0,15.0,15.0]) )
+        if (allocated(error)) return
+
+        call matvec( COO , vec_x, vec_y2 )
+        call check(error, all(vec_y1 == vec_y2) )
+        if (allocated(error)) return
         
     end subroutine
 
-    subroutine test_csr()
+    subroutine test_coo2ordered(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
+        type(COOr32_t) :: COO
+
+        call COO%malloc(4,4,12)
+        COO%data(:) = 1
+        COO%index(:,1) = [1,2]
+        COO%index(:,2) = [1,3]
+        COO%index(:,3) = [1,4]
+        COO%index(:,4) = [2,3]
+        COO%index(:,5) = [2,4]
+        COO%index(:,6) = [3,4]
+
+        COO%index(:,7) = [2,3]
+        COO%index(:,8) = [2,4]
+        COO%index(:,9) = [2,5]
+        COO%index(:,10) = [3,4]
+        COO%index(:,11) = [3,5]
+        COO%index(:,12) = [4,5]
+
+        call coo2ordered(COO)
+        call check(error, COO%NNZ < 12 .and. COO%NNZ == 9 )
+        if (allocated(error)) return
+
+        call check(error, all(COO%data==[1,1,1,2,2,1,2,1,1])  )
+        if (allocated(error)) return
+
+        call check(error, all(COO%index(1,:)==[1,1,1,2,2,2,3,3,4])  )
+        if (allocated(error)) return
+
+        call check(error, all(COO%index(2,:)==[2,3,4,3,4,5,4,5,5])  )
+        if (allocated(error)) return
+
+    end subroutine 
+
+    subroutine test_csr(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
         type(CSRr64_t) :: CSR
         real(dp), allocatable :: vec_x(:)
         real(dp), allocatable :: vec_y(:)
@@ -45,11 +104,15 @@ module test_fsparse
         allocate( vec_x(5) , source = 1._dp )
         allocate( vec_y(4) , source = 0._dp )
         call matvec( CSR , vec_x , vec_y )
-        print *, vec_y
+        
+        call check(error, all(vec_y == dble([6.0,11.0,15.0,15.0])) )
+        if (allocated(error)) return
         
     end subroutine
 
-    subroutine test_csc()
+    subroutine test_csc(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
         type(CSCr64_t) :: CSC
         real(dp), allocatable :: vec_x(:)
         real(dp), allocatable :: vec_y(:)
@@ -62,11 +125,15 @@ module test_fsparse
         allocate( vec_x(5) , source = 1._dp )
         allocate( vec_y(4) , source = 0._dp )
         call matvec( CSC , vec_x , vec_y )
-        print *, vec_y
+
+        call check(error, all(vec_y == dble([6.0,11.0,15.0,15.0])) )
+        if (allocated(error)) return
         
     end subroutine
 
-    subroutine test_ell()
+    subroutine test_ell(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
         type(ELLr32_t) :: ELL
         real(sp), allocatable :: vec_x(:)
         real(sp), allocatable :: vec_y(:)
@@ -85,8 +152,37 @@ module test_fsparse
         allocate( vec_x(5) , source = 1._sp )
         allocate( vec_y(4) , source = 0._sp )
         call matvec( ELL , vec_x , vec_y )
-        print *, vec_y
+
+        call check(error, all(vec_y == [6.0,11.0,15.0,15.0]) )
+        if (allocated(error)) return
         
     end subroutine
 
-end module
+end module test_fsparse
+
+program tester
+    use, intrinsic :: iso_fortran_env, only : error_unit
+    use testdrive, only : run_testsuite, new_testsuite, testsuite_type
+    use test_fsparse, only : collect_suite
+    implicit none
+    integer :: stat, is
+    type(testsuite_type), allocatable :: testsuites(:)
+    character(len=*), parameter :: fmt = '("#", *(1x, a))'
+  
+    stat = 0
+  
+    testsuites = [ &
+      new_testsuite("fsparse", collect_suite) &
+      ]
+  
+    do is = 1, size(testsuites)
+      write(error_unit, fmt) "Testing:", testsuites(is)%name
+      call run_testsuite(testsuites(is)%collect, error_unit, stat)
+    end do
+  
+    if (stat > 0) then
+      write(error_unit, '(i0, 1x, a)') stat, "test(s) failed!"
+      error stop
+    end if
+  
+  end program tester
