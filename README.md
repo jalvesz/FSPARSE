@@ -1,4 +1,5 @@
 ![fsparse](media/logo.png)
+[![DOI](https://zenodo.org/badge/686752490.svg)](https://zenodo.org/badge/latestdoi/686752490)
 
 FSPARSE: Fortran Sparse Gallery library
 =======================================
