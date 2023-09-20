@@ -1,8 +1,10 @@
-integer, intent(in)     :: N, M, NNZ, dim
+integer, intent(in)     :: nrows
+integer, intent(in)     :: ncols
+integer, intent(in)     :: NNZ, dim
 integer, intent(in)     :: index(2,NNZ)
 real(wp), intent(in)    :: data(NNZ)
-real(wp), intent(in)    :: vec_x(dim,M)
-real(wp), intent(inout) :: vec_y(dim,N)
+real(wp), intent(in)    :: vec_x(dim,nrows)
+real(wp), intent(inout) :: vec_y(dim,ncols)
 integer :: k, ik, jk
 
 do concurrent (k = 1:NNZ)

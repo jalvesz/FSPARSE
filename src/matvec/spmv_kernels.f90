@@ -61,125 +61,125 @@ module spmv_kernels
     contains
 
     !! spmv_coo_kernels
-    subroutine spmv_coo_1d_sp(data,index,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_coo_1d_sp(data,index,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_coo_1d.inc'
     end subroutine
 
-    subroutine spmv_coo_1d_dp(data,index,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_coo_1d_dp(data,index,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_coo_1d.inc'
     end subroutine
 
-    subroutine spmv_coo_2d_sp(data,index,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_coo_2d_sp(data,index,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_coo_2d.inc'
     end subroutine
 
-    subroutine spmv_coo_2d_dp(data,index,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_coo_2d_dp(data,index,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_coo_2d.inc'
     end subroutine
 
-    subroutine spmv_coo_sym_1d_sp(data,index,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_coo_sym_1d_sp(data,index,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_coo_sym_1d.inc'
     end subroutine
 
-    subroutine spmv_coo_sym_1d_dp(data,index,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_coo_sym_1d_dp(data,index,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_coo_sym_1d.inc'
     end subroutine
 
-    subroutine spmv_coo_sym_2d_sp(data,index,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_coo_sym_2d_sp(data,index,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_coo_sym_2d.inc'
     end subroutine
 
-    subroutine spmv_coo_sym_2d_dp(data,index,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_coo_sym_2d_dp(data,index,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_coo_sym_2d.inc'
     end subroutine
 
     !! spmv_csr_kernels
-    subroutine spmv_csr_1d_sp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_1d_sp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csr_1d.inc'
     end subroutine
 
-    subroutine spmv_csr_1d_dp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_1d_dp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csr_1d.inc'
     end subroutine
 
-    subroutine spmv_csr_2d_sp(data,col,rowptr,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_csr_2d_sp(data,col,rowptr,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csr_2d.inc'
     end subroutine
 
-    subroutine spmv_csr_2d_dp(data,col,rowptr,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_csr_2d_dp(data,col,rowptr,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csr_2d.inc'
     end subroutine
 
-    subroutine spmv_csr_syminf_1d_sp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_syminf_1d_sp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csr_syminf_1d.inc'
     end subroutine
 
-    subroutine spmv_csr_syminf_1d_dp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_syminf_1d_dp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csr_syminf_1d.inc'
     end subroutine
 
-    subroutine spmv_csr_symsup_1d_sp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_symsup_1d_sp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csr_symsup_1d.inc'
     end subroutine
 
-    subroutine spmv_csr_symsup_1d_dp(data,col,rowptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csr_symsup_1d_dp(data,col,rowptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csr_symsup_1d.inc'
     end subroutine
 
     !! spmv_csc_kernels
-    subroutine spmv_csc_1d_sp(data,row,colptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csc_1d_sp(data,row,colptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csc_1d.inc'
     end subroutine
 
-    subroutine spmv_csc_1d_dp(data,row,colptr,N,M,NNZ,vec_x,vec_y)
+    subroutine spmv_csc_1d_dp(data,row,colptr,nrows,ncols,NNZ,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csc_1d.inc'
     end subroutine
 
-    subroutine spmv_csc_2d_sp(data,row,colptr,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_csc_2d_sp(data,row,colptr,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_csc_2d.inc'
     end subroutine
 
-    subroutine spmv_csc_2d_dp(data,row,colptr,N,M,NNZ,dim,vec_x,vec_y)
+    subroutine spmv_csc_2d_dp(data,row,colptr,nrows,ncols,NNZ,dim,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_csc_2d.inc'
     end subroutine
 
     !! spmv_ell_kernels
-    subroutine spmv_ell_1d_sp(data,index,N,M,MNZ_P_ROW,vec_x,vec_y)
+    subroutine spmv_ell_1d_sp(data,index,nrows,ncols,MNZ_P_ROW,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_ell_1d.inc'
     end subroutine
 
-    subroutine spmv_ell_1d_dp(data,index,N,M,MNZ_P_ROW,vec_x,vec_y)
+    subroutine spmv_ell_1d_dp(data,index,nrows,ncols,MNZ_P_ROW,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_ell_1d.inc'
     end subroutine
 
-    subroutine spmv_ell_2d_sp(data,index,N,M,MNZ_P_ROW,dim,vec_x,vec_y)
+    subroutine spmv_ell_2d_sp(data,index,nrows,ncols,MNZ_P_ROW,dim,vec_x,vec_y)
         integer, parameter      :: wp = real32
         include 'spmv_ell_2d.inc'
     end subroutine
 
-    subroutine spmv_ell_2d_dp(data,index,N,M,MNZ_P_ROW,dim,vec_x,vec_y)
+    subroutine spmv_ell_2d_dp(data,index,nrows,ncols,MNZ_P_ROW,dim,vec_x,vec_y)
         integer, parameter      :: wp = real64
         include 'spmv_ell_2d.inc'
     end subroutine
