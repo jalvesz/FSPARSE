@@ -85,6 +85,20 @@ allocate( vec_x(5) , source = 1._dp )
 allocate( vec_y(4) , source = 0._dp )
 call matvec( CSR , vec_x , vec_y )
 ```
+Building and using
+==================
+The project was built using the [Fortran Package Manager](https://github.com/fortran-lang/fpm). A manifest file is included to build and test with FPM. For example:
+
+```
+fpm build --profile release
+fpm test --profile release
+```
+
+To use `fsparse` within your FPM project, add the following to your `fpm.toml` file:
+```toml
+[dependencies]
+fsparse = { git="https://github.com/jalvesz/FSPARSE" }
+```
 
 Inspiration
 ===========
