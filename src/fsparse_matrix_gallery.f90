@@ -48,11 +48,11 @@ module fsparse_matrix_gallery
     end type
    
     type, extends(COO_t) :: COOc32_t
-      complex(4), allocatable :: data(:) !! single precision values
+      complex(sp), allocatable :: data(:) !! single precision values
     end type
   
     type, extends(COO_t) :: COOc64_t
-      complex(8), allocatable :: data(:) !! double precision values
+      complex(dp), allocatable :: data(:) !! double precision values
     end type
   
     !! CSR: Compressed sparse row or Yale format
@@ -72,11 +72,11 @@ module fsparse_matrix_gallery
     end type
   
     type, extends(CSR_t) :: CSRc32_t
-      complex(4), allocatable :: data(:)   !! single precision values
+      complex(sp), allocatable :: data(:)   !! single precision values
     end type
   
     type, extends(CSR_t) :: CSRc64_t 
-      complex(8), allocatable :: data(:)   !! double precision values
+      complex(dp), allocatable :: data(:)   !! double precision values
     end type
   
 
@@ -97,11 +97,11 @@ module fsparse_matrix_gallery
     end type
   
     type, extends(CSC_t) :: CSCc32_t 
-      complex(4), allocatable :: data(:)   !! single precision values
+      complex(sp), allocatable :: data(:)   !! single precision values
     end type
   
     type, extends(CSC_t) :: CSCc64_t 
-      complex(8), allocatable :: data(:)   !! double precision values
+      complex(dp), allocatable :: data(:)   !! double precision values
     end type
   
     !! Compressed ELLPACK
@@ -122,11 +122,11 @@ module fsparse_matrix_gallery
   
   
     type, extends(ELL_t) :: ELLc32_t 
-      complex(4), allocatable :: data(:,:) !! single precision values
+      complex(sp), allocatable :: data(:,:) !! single precision values
     end type
   
     type, extends(ELL_t) :: ELLc64_t 
-      complex(8), allocatable :: data(:,:) !! double precision values
+      complex(dp), allocatable :: data(:,:) !! double precision values
     end type
   
   contains
@@ -140,8 +140,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:,:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
-      complex(4),allocatable:: ctemp(:)
-      complex(8),allocatable:: ztemp(:)
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
       
       self%nrows = num_rows
       self%ncols = num_cols
@@ -195,8 +195,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
-      complex(4),allocatable:: ctemp(:)
-      complex(8),allocatable:: ztemp(:)
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
   
       self%nrows = num_rows
       self%ncols = num_cols
@@ -257,8 +257,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
-      complex(4),allocatable:: ctemp(:)
-      complex(8),allocatable:: ztemp(:)
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
   
       self%nrows = num_rows
       self%ncols = num_cols
@@ -319,8 +319,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:,:)
       real(sp), allocatable :: stemp(:,:)
       real(dp), allocatable :: dtemp(:,:)
-      complex(4),allocatable:: ctemp(:,:)
-      complex(8),allocatable:: ztemp(:,:)
+      complex(sp),allocatable:: ctemp(:,:)
+      complex(dp),allocatable:: ztemp(:,:)
   
       self%nrows = num_rows
       self%ncols = num_cols

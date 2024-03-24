@@ -11,38 +11,38 @@ module fsparse_conversions
     implicit none
     
     interface dense2coo
-        module procedure dense2coo_sp
-        module procedure dense2coo_dp
-        module procedure dense2coo_c
-        module procedure dense2coo_z
+        module procedure dense2coo_r_sp
+        module procedure dense2coo_r_dp
+        module procedure dense2coo_c_sp
+        module procedure dense2coo_c_dp
     end interface
 
     interface coo2dense
-        module procedure coo2dense_sp
-        module procedure coo2dense_dp
-        module procedure coo2dense_c
-        module procedure coo2dense_z
+        module procedure coo2dense_r_sp
+        module procedure coo2dense_r_dp
+        module procedure coo2dense_c_sp
+        module procedure coo2dense_c_dp
     end interface
 
     interface coo2csr
         module procedure coo2csr_ordered
-        module procedure coo2csr_ordered_sp
-        module procedure coo2csr_ordered_dp
-        module procedure coo2csr_ordered_c
-        module procedure coo2csr_ordered_z
+        module procedure coo2csr_ordered_r_sp
+        module procedure coo2csr_ordered_r_dp
+        module procedure coo2csr_ordered_c_sp
+        module procedure coo2csr_ordered_c_dp
     end interface
 
     interface csr2coo
         module procedure csr2coo
-        module procedure csr2coo_sp
-        module procedure csr2coo_dp
-        module procedure csr2coo_c
-        module procedure csr2coo_z
+        module procedure csr2coo_r_sp
+        module procedure csr2coo_r_dp
+        module procedure csr2coo_c_sp
+        module procedure csr2coo_c_dp
     end interface
 
 contains
 
-    subroutine dense2coo_sp(dense,COO)
+    subroutine dense2coo_r_sp(dense,COO)
         integer, parameter :: wp = real32
         real(wp), intent(in) :: dense(:,:)
         type(COOr32_t), intent(inout) :: COO
@@ -68,7 +68,7 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_dp(dense,COO)
+    subroutine dense2coo_r_dp(dense,COO)
         integer, parameter :: wp = real64
         real(wp), intent(in) :: dense(:,:)
         type(COOr64_t), intent(inout) :: COO
@@ -94,8 +94,8 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_c(dense,COO)
-        integer, parameter :: wp = 4
+    subroutine dense2coo_c_sp(dense,COO)
+        integer, parameter :: wp = real32
         complex(wp), intent(in) :: dense(:,:)
         type(COOc32_t), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
@@ -120,8 +120,8 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_z(dense,COO)
-        integer, parameter :: wp = 8
+    subroutine dense2coo_c_dp(dense,COO)
+        integer, parameter :: wp = real64
         complex(wp), intent(in) :: dense(:,:)
         type(COOc64_t), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
@@ -146,7 +146,7 @@ contains
         COO%isOrdered = .true.
     end subroutine
     
-    subroutine coo2dense_sp(COO,dense)
+    subroutine coo2dense_r_sp(COO,dense)
         integer, parameter :: wp = real32
         type(COOr32_t), intent(in) :: COO
         real(wp), intent(inout) :: dense(:,:)
@@ -157,7 +157,7 @@ contains
         end do
     end subroutine
 
-    subroutine coo2dense_dp(COO,dense)
+    subroutine coo2dense_r_dp(COO,dense)
         integer, parameter :: wp = real64
         type(COOr64_t), intent(in) :: COO
         real(wp), intent(inout) :: dense(:,:)
@@ -168,8 +168,8 @@ contains
         end do
     end subroutine
     
-    subroutine coo2dense_c(COO,dense)
-        integer, parameter :: wp = 4
+    subroutine coo2dense_c_sp(COO,dense)
+        integer, parameter :: wp = real32
         type(COOc32_t), intent(in) :: COO
         complex(wp), intent(inout) :: dense(:,:)
         integer :: idx
@@ -179,8 +179,8 @@ contains
         end do
     end subroutine
 
-    subroutine coo2dense_z(COO,dense)
-        integer, parameter :: wp = 8
+    subroutine coo2dense_c_dp(COO,dense)
+        integer, parameter :: wp = real64
         type(COOc64_t), intent(in) :: COO
         complex(wp), intent(inout) :: dense(:,:)
         integer :: idx
@@ -219,7 +219,7 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_sp(COO,CSR)
+    subroutine coo2csr_ordered_r_sp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
         type(COOr32_t), intent(in)    :: COO
@@ -250,7 +250,7 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_dp(COO,CSR)
+    subroutine coo2csr_ordered_r_dp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
         type(COOr64_t), intent(in)    :: COO
@@ -282,7 +282,7 @@ contains
     end subroutine
 
 
-    subroutine coo2csr_ordered_c(COO,CSR)
+    subroutine coo2csr_ordered_c_sp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
         type(COOc32_t), intent(in)    :: COO
@@ -313,7 +313,7 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_z(COO,CSR)
+    subroutine coo2csr_ordered_c_dp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
         type(COOc64_t), intent(in)    :: COO
@@ -363,7 +363,7 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_sp(CSR,COO)
+    subroutine csr2coo_r_sp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
         type(CSRr32_t), intent(in)    :: CSR
         type(COOr32_t), intent(inout) :: COO
@@ -387,7 +387,7 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_dp(CSR,COO)
+    subroutine csr2coo_r_dp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
         type(CSRr64_t), intent(in)    :: CSR
         type(COOr64_t), intent(inout) :: COO
@@ -411,7 +411,7 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_c(CSR,COO)
+    subroutine csr2coo_c_sp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
         type(CSRc32_t), intent(in)    :: CSR
         type(COOc32_t), intent(inout) :: COO
@@ -435,7 +435,7 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_z(CSR,COO)
+    subroutine csr2coo_c_dp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
         type(CSRc64_t), intent(in)    :: CSR
         type(COOc64_t), intent(inout) :: COO

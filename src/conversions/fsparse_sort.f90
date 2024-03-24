@@ -12,18 +12,18 @@ module fsparse_sort
 
     interface sort_coo
         module procedure sort_coo_unique
-        module procedure sort_coo_unique_sp
-        module procedure sort_coo_unique_dp
-        module procedure sort_coo_unique_c
-        module procedure sort_coo_unique_z
+        module procedure sort_coo_unique_r_sp
+        module procedure sort_coo_unique_r_dp
+        module procedure sort_coo_unique_c_sp
+        module procedure sort_coo_unique_c_dp
     end interface
 
     interface coo2ordered
         module procedure coo2ordered_i
-        module procedure coo2ordered_s
-        module procedure coo2ordered_d
-        module procedure coo2ordered_c
-        module procedure coo2ordered_z
+        module procedure coo2ordered_r_s
+        module procedure coo2ordered_r_d
+        module procedure coo2ordered_c_s
+        module procedure coo2ordered_c_d
     end interface
 
     public :: coo2ordered
@@ -112,7 +112,7 @@ module fsparse_sort
     end subroutine quicksort_id
 
     recursive subroutine quicksort_ic(a, b, first, last)
-        integer, parameter :: wp = 4
+        integer, parameter :: wp = real32
         integer, intent(inout)  :: a(*) !! reference table to sort
         complex(wp), intent(inout) :: b(*) !! secondary complex data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
@@ -140,7 +140,7 @@ module fsparse_sort
     end subroutine quicksort_ic
 
     recursive subroutine quicksort_iz(a, b, first, last)
-        integer, parameter :: wp = 8
+        integer, parameter :: wp = real64
         integer, intent(inout)  :: a(*) !! reference table to sort
         complex(wp), intent(inout) :: b(*) !! secondary complex data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
@@ -222,7 +222,7 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_sp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_r_sp( a, n, data, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
         integer, parameter :: wp = real32 
         real(wp), intent(inout) :: data(*)
@@ -284,7 +284,7 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_dp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_r_dp( a, n, data, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
         integer, parameter :: wp = real64
         real(wp), intent(inout) :: data(*)
@@ -346,9 +346,9 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_c( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_c_sp( a, n, data, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = 4 
+        integer, parameter :: wp = real32 
         complex(wp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
@@ -408,9 +408,9 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_z( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_c_dp( a, n, data, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = 8
+        integer, parameter :: wp = real64
         complex(wp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
@@ -485,8 +485,8 @@ module fsparse_sort
         end if
     end subroutine
 
-    subroutine coo2ordered_s(COO)
-        integer, parameter :: wp=real32
+    subroutine coo2ordered_r_s(COO)
+        integer, parameter :: wp = real32
         type(COOr32_t), intent(inout) :: COO
         integer, allocatable :: itemp(:,:)
         real(wp), allocatable :: rtemp(:)
@@ -504,8 +504,8 @@ module fsparse_sort
         end if
     end subroutine
 
-    subroutine coo2ordered_d(COO)
-        integer, parameter :: wp=real64
+    subroutine coo2ordered_r_d(COO)
+        integer, parameter :: wp = real64
         type(COOr64_t), intent(inout) :: COO
         integer, allocatable :: itemp(:,:)
         real(wp), allocatable :: rtemp(:)
@@ -523,8 +523,8 @@ module fsparse_sort
         end if
     end subroutine
 
-    subroutine coo2ordered_c(COO)
-        integer, parameter :: wp=4
+    subroutine coo2ordered_c_s(COO)
+        integer, parameter :: wp = real32
         type(COOc32_t), intent(inout) :: COO
         integer, allocatable :: itemp(:,:)
         complex(wp), allocatable :: ctemp(:)
@@ -542,8 +542,8 @@ module fsparse_sort
         end if
     end subroutine
 
-    subroutine coo2ordered_z(COO)
-        integer, parameter :: wp=8
+    subroutine coo2ordered_c_d(COO)
+        integer, parameter :: wp = real64
         type(COOc64_t), intent(inout) :: COO
         integer, allocatable :: itemp(:,:)
         complex(wp), allocatable :: ztemp(:)
