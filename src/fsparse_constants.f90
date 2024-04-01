@@ -17,12 +17,10 @@ module fsparse_constants
     integer, parameter :: xdp = -1
 
     !> Quadruple precision real numbers
-    integer, parameter :: qp = selected_real_kind(33)
+    integer, parameter :: qp = -1
     
-    integer, parameter, public :: zero_sp = 0._sp
-    integer, parameter, public :: zero_dp = 0._dp
-    integer, parameter, public :: zero_qp = 0._qp
-    integer, parameter, public :: zero_csp = (0._sp,0._sp)
-    integer, parameter, public :: zero_cdp = (0._dp,0._dp)
-    integer, parameter, public :: zero_cqp = (0._qp,0._qp)
+    real(sp), parameter, public :: zero_sp = 0._sp
+    real(dp), parameter, public :: zero_dp = 0._dp
+    complex(sp), parameter, public :: zero_csp = (0._sp,0._sp)
+    complex(dp), parameter, public :: zero_cdp = (0._dp,0._dp)
 end module fsparse_constants

@@ -46,12 +46,6 @@ module fsparse_matrix_gallery
         procedure :: get => get_value_coo_dp
         procedure :: set => set_value_coo_dp
     end type
-    type, public, extends(COO_t) :: COO_qp
-        real(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_coo_qp
-        procedure :: set => set_value_coo_qp
-    end type
     type, public, extends(COO_t) :: COO_csp
         complex(sp), allocatable :: data(:) 
     contains
@@ -63,12 +57,6 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_coo_cdp
         procedure :: set => set_value_coo_cdp
-    end type
-    type, public, extends(COO_t) :: COO_cqp
-        complex(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_coo_cqp
-        procedure :: set => set_value_coo_cqp
     end type
 
     !! CSR: Compressed sparse row or Yale format
@@ -91,12 +79,6 @@ module fsparse_matrix_gallery
         procedure :: get => get_value_csr_dp
         procedure :: set => set_value_csr_dp
     end type
-    type, public, extends(CSR_t) :: CSR_qp
-        real(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_csr_qp
-        procedure :: set => set_value_csr_qp
-    end type
     type, public, extends(CSR_t) :: CSR_csp
         complex(sp), allocatable :: data(:) 
     contains
@@ -108,12 +90,6 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_csr_cdp
         procedure :: set => set_value_csr_cdp
-    end type
-    type, public, extends(CSR_t) :: CSR_cqp
-        complex(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_csr_cqp
-        procedure :: set => set_value_csr_cqp
     end type
 
     !! CSC: Compressed sparse column
@@ -136,12 +112,6 @@ module fsparse_matrix_gallery
         procedure :: get => get_value_csc_dp
         procedure :: set => set_value_csc_dp
     end type
-    type, public, extends(CSC_t) :: CSC_qp
-        real(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_csc_qp
-        procedure :: set => set_value_csc_qp
-    end type
     type, public, extends(CSC_t) :: CSC_csp
         complex(sp), allocatable :: data(:) 
     contains
@@ -153,12 +123,6 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_csc_cdp
         procedure :: set => set_value_csc_cdp
-    end type
-    type, public, extends(CSC_t) :: CSC_cqp
-        complex(qp), allocatable :: data(:) 
-    contains
-        procedure :: get => get_value_csc_cqp
-        procedure :: set => set_value_csc_cqp
     end type
   
     !! Compressed ELLPACK
@@ -181,12 +145,6 @@ module fsparse_matrix_gallery
         procedure :: get => get_value_ell_dp
         procedure :: set => set_value_ell_dp
     end type
-    type, public, extends(ELL_t) :: ELL_qp
-        real(qp), allocatable :: data(:,:) 
-    contains
-        procedure :: get => get_value_ell_qp
-        procedure :: set => set_value_ell_qp
-    end type
     type, public, extends(ELL_t) :: ELL_csp
         complex(sp), allocatable :: data(:,:) 
     contains
@@ -198,12 +156,6 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_ell_cdp
         procedure :: set => set_value_ell_cdp
-    end type
-    type, public, extends(ELL_t) :: ELL_cqp
-        complex(qp), allocatable :: data(:,:) 
-    contains
-        procedure :: get => get_value_ell_cqp
-        procedure :: set => set_value_ell_cqp
     end type
 
 contains
@@ -249,16 +201,6 @@ contains
                 end if
                 call move_alloc(from=temp,to=self%data)
                 end block
-            type is(COO_qp)
-                block
-                real(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_qp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
             type is(COO_csp)
                 block
                 complex(sp), allocatable :: temp(:)
@@ -274,16 +216,6 @@ contains
                 complex(dp), allocatable :: temp(:)
                 if(.not.allocated(self%data)) then
                     allocate(temp(nnz)); temp = zero_cdp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
-            type is(COO_cqp)
-                block
-                complex(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_cqp
                 else
                     allocate(temp(nnz) , source = self%data )
                 end if
@@ -340,16 +272,6 @@ contains
                 end if
                 call move_alloc(from=temp,to=self%data)
                 end block
-            type is(CSR_qp)
-                block
-                real(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_qp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
             type is(CSR_csp)
                 block
                 complex(sp), allocatable :: temp(:)
@@ -365,16 +287,6 @@ contains
                 complex(dp), allocatable :: temp(:)
                 if(.not.allocated(self%data)) then
                     allocate(temp(nnz)); temp = zero_cdp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
-            type is(CSR_cqp)
-                block
-                complex(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_cqp
                 else
                     allocate(temp(nnz) , source = self%data )
                 end if
@@ -431,16 +343,6 @@ contains
                 end if
                 call move_alloc(from=temp,to=self%data)
                 end block
-            type is(CSC_qp)
-                block
-                real(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_qp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
             type is(CSC_csp)
                 block
                 complex(sp), allocatable :: temp(:)
@@ -456,16 +358,6 @@ contains
                 complex(dp), allocatable :: temp(:)
                 if(.not.allocated(self%data)) then
                     allocate(temp(nnz)); temp = zero_cdp
-                else
-                    allocate(temp(nnz) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
-            type is(CSC_cqp)
-                block
-                complex(qp), allocatable :: temp(:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(nnz)); temp = zero_cqp
                 else
                     allocate(temp(nnz) , source = self%data )
                 end if
@@ -515,16 +407,6 @@ contains
                 end if
                 call move_alloc(from=temp,to=self%data)
                 end block
-            type is(ELL_qp)
-                block
-                real(qp), allocatable :: temp(:,:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(num_rows,num_nz_rows)); temp = zero_qp
-                else
-                    allocate(temp(num_rows,num_nz_rows) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
             type is(ELL_csp)
                 block
                 complex(sp), allocatable :: temp(:,:)
@@ -540,16 +422,6 @@ contains
                 complex(dp), allocatable :: temp(:,:)
                 if(.not.allocated(self%data)) then
                     allocate(temp(num_rows,num_nz_rows)); temp = zero_cdp
-                else
-                    allocate(temp(num_rows,num_nz_rows) , source = self%data )
-                end if
-                call move_alloc(from=temp,to=self%data)
-                end block
-            type is(ELL_cqp)
-                block
-                complex(qp), allocatable :: temp(:,:)
-                if(.not.allocated(self%data)) then
-                    allocate(temp(num_rows,num_nz_rows)); temp = zero_cqp
                 else
                     allocate(temp(num_rows,num_nz_rows) , source = self%data )
                 end if
@@ -620,35 +492,6 @@ contains
         end do
     end subroutine
 
-    pure subroutine get_value_coo_qp(self,val,ik,jk)
-        class(COO_qp), intent(in) :: self
-        real(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1,self%nnz
-            if( ik == self%index(1,k) .and. jk == self%index(2,k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_qp
-    end subroutine
-
-    subroutine set_value_coo_qp(self,val,ik,jk)
-        class(COO_qp), intent(inout) :: self
-        real(qp), intent(in) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1,self%nnz
-            if( ik == self%index(1,k) .and. jk == self%index(2,k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
     pure subroutine get_value_coo_csp(self,val,ik,jk)
         class(COO_csp), intent(in) :: self
         complex(sp), intent(out) :: val
@@ -696,35 +539,6 @@ contains
     subroutine set_value_coo_cdp(self,val,ik,jk)
         class(COO_cdp), intent(inout) :: self
         complex(dp), intent(in) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1,self%nnz
-            if( ik == self%index(1,k) .and. jk == self%index(2,k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
-    pure subroutine get_value_coo_cqp(self,val,ik,jk)
-        class(COO_cqp), intent(in) :: self
-        complex(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1,self%nnz
-            if( ik == self%index(1,k) .and. jk == self%index(2,k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_cqp
-    end subroutine
-
-    subroutine set_value_coo_cqp(self,val,ik,jk)
-        class(COO_cqp), intent(inout) :: self
-        complex(qp), intent(in) :: val
         integer, intent(in) :: ik, jk
         integer :: k
         ! naive implementation
@@ -795,35 +609,6 @@ contains
         end do
     end subroutine
 
-    pure subroutine get_value_csr_qp(self,val,ik,jk)
-        class(CSR_qp), intent(in) :: self
-        real(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%rowptr(ik), self%rowptr(ik+1)-1
-            if( jk == self%col(k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_qp
-    end subroutine
-
-    subroutine set_value_csr_qp(self,val,ik,jk)
-        class(CSR_qp), intent(inout) :: self
-        real(qp), intent(in) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%rowptr(ik), self%rowptr(ik+1)-1
-            if( jk == self%col(k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
     pure subroutine get_value_csr_csp(self,val,ik,jk)
         class(CSR_csp), intent(in) :: self
         complex(sp), intent(out) :: val
@@ -871,35 +656,6 @@ contains
     subroutine set_value_csr_cdp(self,val,ik,jk)
         class(CSR_cdp), intent(inout) :: self
         complex(dp), intent(in) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%rowptr(ik), self%rowptr(ik+1)-1
-            if( jk == self%col(k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
-    pure subroutine get_value_csr_cqp(self,val,ik,jk)
-        class(CSR_cqp), intent(in) :: self
-        complex(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%rowptr(ik), self%rowptr(ik+1)-1
-            if( jk == self%col(k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_cqp
-    end subroutine
-
-    subroutine set_value_csr_cqp(self,val,ik,jk)
-        class(CSR_cqp), intent(inout) :: self
-        complex(qp), intent(in) :: val
         integer, intent(in) :: ik, jk
         integer :: k
         ! naive implementation
@@ -970,35 +726,6 @@ contains
         end do
     end subroutine
 
-    pure subroutine get_value_csc_qp(self,val,ik,jk)
-        class(CSC_qp), intent(in) :: self
-        real(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%colptr(jk), self%colptr(jk+1)-1
-            if( ik == self%row(k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_qp
-    end subroutine
-
-    subroutine set_value_csc_qp(self,val,ik,jk)
-        class(CSC_qp), intent(inout) :: self
-        real(qp), intent(in) :: val
-        integer, intent(in)  :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%colptr(jk), self%colptr(jk+1)-1
-            if( ik == self%row(k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
     pure subroutine get_value_csc_csp(self,val,ik,jk)
         class(CSC_csp), intent(in) :: self
         complex(sp), intent(out) :: val
@@ -1046,35 +773,6 @@ contains
     subroutine set_value_csc_cdp(self,val,ik,jk)
         class(CSC_cdp), intent(inout) :: self
         complex(dp), intent(in) :: val
-        integer, intent(in)  :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%colptr(jk), self%colptr(jk+1)-1
-            if( ik == self%row(k) ) then
-                self%data(k) = val
-                return
-            end if
-        end do
-    end subroutine
-
-    pure subroutine get_value_csc_cqp(self,val,ik,jk)
-        class(CSC_cqp), intent(in) :: self
-        complex(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = self%colptr(jk), self%colptr(jk+1)-1
-            if( ik == self%row(k) ) then
-                val = self%data(k)
-                return
-            end if
-        end do
-        val = zero_cqp
-    end subroutine
-
-    subroutine set_value_csc_cqp(self,val,ik,jk)
-        class(CSC_cqp), intent(inout) :: self
-        complex(qp), intent(in) :: val
         integer, intent(in)  :: ik, jk
         integer :: k
         ! naive implementation
@@ -1145,35 +843,6 @@ contains
         end do
     end subroutine
 
-    pure subroutine get_value_ell_qp(self,val,ik,jk)
-        class(ELL_qp), intent(in) :: self
-        real(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1 , self%K
-            if( jk == self%index(ik,k) ) then
-                val = self%data(ik,k)
-                return
-            end if
-        end do
-        val = zero_qp
-    end subroutine
-
-    subroutine set_value_ell_qp(self,val,ik,jk)
-        class(ELL_qp), intent(inout) :: self
-        real(qp), intent(in) :: val
-        integer, intent(in)  :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1 , self%K
-            if( jk == self%index(ik,k) ) then
-                self%data(ik,k) = val
-                return
-            end if
-        end do
-    end subroutine
-
     pure subroutine get_value_ell_csp(self,val,ik,jk)
         class(ELL_csp), intent(in) :: self
         complex(sp), intent(out) :: val
@@ -1221,35 +890,6 @@ contains
     subroutine set_value_ell_cdp(self,val,ik,jk)
         class(ELL_cdp), intent(inout) :: self
         complex(dp), intent(in) :: val
-        integer, intent(in)  :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1 , self%K
-            if( jk == self%index(ik,k) ) then
-                self%data(ik,k) = val
-                return
-            end if
-        end do
-    end subroutine
-
-    pure subroutine get_value_ell_cqp(self,val,ik,jk)
-        class(ELL_cqp), intent(in) :: self
-        complex(qp), intent(out) :: val
-        integer, intent(in) :: ik, jk
-        integer :: k
-        ! naive implementation
-        do k = 1 , self%K
-            if( jk == self%index(ik,k) ) then
-                val = self%data(ik,k)
-                return
-            end if
-        end do
-        val = zero_cqp
-    end subroutine
-
-    subroutine set_value_ell_cqp(self,val,ik,jk)
-        class(ELL_cqp), intent(inout) :: self
-        complex(qp), intent(in) :: val
         integer, intent(in)  :: ik, jk
         integer :: k
         ! naive implementation

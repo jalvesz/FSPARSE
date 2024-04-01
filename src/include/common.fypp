@@ -54,4 +54,26 @@
 #! Collected (kind, type, suffix) tuples for complex types
 #:set CMPLX_KINDS_TYPES = list(zip(CMPLX_KINDS, CMPLX_TYPES, CMPLX_SUFFIX))
 
+#! Integer kinds to be considered during templating
+#:set INT_KINDS = ["int8", "int16", "int32", "int64"]
+
+#! Integer types to be considered during templating
+#:set INT_TYPES = ["integer({})".format(k) for k in INT_KINDS]
+
+#! Collected (kind, type) tuples for integer types
+#:set INT_KINDS_TYPES = list(zip(INT_KINDS, INT_TYPES))
+
+
+#! Generates an array rank suffix.
+#!
+#! Args:
+#!     rank (int): Rank of the variable
+#!
+#! Returns:
+#!     Array rank suffix string (e.g. (:,:) if rank = 2)
+#!
+#:def ranksuffix(rank)
+#{if rank > 0}#(${":" + ",:" * (rank - 1)}$)#{endif}#
+#:enddef
+
 #:endmute
