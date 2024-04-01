@@ -5,25 +5,25 @@
 ! license that can be found in the LICENSE.md file
 !---------------------------------------------------
 module fsparse_sort
-    use iso_fortran_env
+    use fsparse_constants
     use fsparse_matrix_gallery
     implicit none
     private
 
     interface sort_coo
         module procedure sort_coo_unique
-        module procedure sort_coo_unique_r_sp
-        module procedure sort_coo_unique_r_dp
-        module procedure sort_coo_unique_c_sp
-        module procedure sort_coo_unique_c_dp
+        module procedure sort_coo_unique_sp
+        module procedure sort_coo_unique_dp
+        module procedure sort_coo_unique_csp
+        module procedure sort_coo_unique_cdp
     end interface
 
-    interface coo2ordered
-        module procedure coo2ordered_i
-        module procedure coo2ordered_r_s
-        module procedure coo2ordered_r_d
-        module procedure coo2ordered_c_s
-        module procedure coo2ordered_c_d
+    interface quicksort
+        module procedure quicksort_i
+        module procedure quicksort_i_sp
+        module procedure quicksort_i_dp
+        module procedure quicksort_i_csp
+        module procedure quicksort_i_cdp
     end interface
 
     public :: coo2ordered
@@ -53,15 +53,15 @@ module fsparse_sort
         end do
         if (first < i-1) call quicksort_i(a, first, i-1)
         if (j+1 < last)  call quicksort_i(a, j+1, last)
-    end subroutine quicksort_i
+    end subroutine
 
-    recursive subroutine quicksort_is(a, b, first, last)
-        integer, parameter :: wp = real32
+    recursive subroutine quicksort_i_sp(a, b, first, last)
+        integer, parameter :: wp = sp
         integer, intent(inout)  :: a(*) !! reference table to sort
-        real(wp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
+        real(sp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
         integer  :: i, j, x, t
-        real(wp) :: d
+        real(sp) :: d
 
         x = a( (first+last) / 2 )
         i = first
@@ -79,17 +79,17 @@ module fsparse_sort
             i=i+1
             j=j-1
         end do
-        if (first < i-1) call quicksort_is(a, b, first, i-1)
-        if (j+1 < last)  call quicksort_is(a, b, j+1, last)
-    end subroutine quicksort_is
+        if (first < i-1) call quicksort_i_sp(a, b, first, i-1)
+        if (j+1 < last)  call quicksort_i_sp(a, b, j+1, last)
+    end subroutine 
 
-    recursive subroutine quicksort_id(a, b, first, last)
-        integer, parameter :: wp = real64
+    recursive subroutine quicksort_i_dp(a, b, first, last)
+        integer, parameter :: wp = sp
         integer, intent(inout)  :: a(*) !! reference table to sort
-        real(wp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
+        real(dp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
         integer  :: i, j, x, t
-        real(wp) :: d
+        real(dp) :: d
 
         x = a( (first+last) / 2 )
         i = first
@@ -107,17 +107,17 @@ module fsparse_sort
             i=i+1
             j=j-1
         end do
-        if (first < i-1) call quicksort_id(a, b, first, i-1)
-        if (j+1 < last)  call quicksort_id(a, b, j+1, last)
-    end subroutine quicksort_id
+        if (first < i-1) call quicksort_i_dp(a, b, first, i-1)
+        if (j+1 < last)  call quicksort_i_dp(a, b, j+1, last)
+    end subroutine 
 
-    recursive subroutine quicksort_ic(a, b, first, last)
-        integer, parameter :: wp = real32
+    recursive subroutine quicksort_i_csp(a, b, first, last)
+        integer, parameter :: wp = sp
         integer, intent(inout)  :: a(*) !! reference table to sort
-        complex(wp), intent(inout) :: b(*) !! secondary complex data to sort w.r.t. a(:)
+        complex(sp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
         integer  :: i, j, x, t
-        complex(wp) :: d
+        complex(sp) :: d
 
         x = a( (first+last) / 2 )
         i = first
@@ -135,17 +135,17 @@ module fsparse_sort
             i=i+1
             j=j-1
         end do
-        if (first < i-1) call quicksort_ic(a, b, first, i-1)
-        if (j+1 < last)  call quicksort_ic(a, b, j+1, last)
-    end subroutine quicksort_ic
+        if (first < i-1) call quicksort_i_csp(a, b, first, i-1)
+        if (j+1 < last)  call quicksort_i_csp(a, b, j+1, last)
+    end subroutine 
 
-    recursive subroutine quicksort_iz(a, b, first, last)
-        integer, parameter :: wp = real64
+    recursive subroutine quicksort_i_cdp(a, b, first, last)
+        integer, parameter :: wp = sp
         integer, intent(inout)  :: a(*) !! reference table to sort
-        complex(wp), intent(inout) :: b(*) !! secondary complex data to sort w.r.t. a(:)
+        complex(dp), intent(inout) :: b(*) !! secondary real data to sort w.r.t. a(:)
         integer, intent(in)     :: first, last
         integer  :: i, j, x, t
-        complex(wp) :: d
+        complex(dp) :: d
 
         x = a( (first+last) / 2 )
         i = first
@@ -163,9 +163,10 @@ module fsparse_sort
             i=i+1
             j=j-1
         end do
-        if (first < i-1) call quicksort_iz(a, b, first, i-1)
-        if (j+1 < last)  call quicksort_iz(a, b, j+1, last)
-    end subroutine quicksort_iz
+        if (first < i-1) call quicksort_i_cdp(a, b, first, i-1)
+        if (j+1 < last)  call quicksort_i_cdp(a, b, j+1, last)
+    end subroutine 
+
 
     subroutine sort_coo_unique( a, n, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
@@ -174,9 +175,9 @@ module fsparse_sort
         integer, intent(in) :: num_rows
         integer, intent(in) :: num_cols
 
-        integer :: stride, maxi, maxj, sze, adr0, adr1, dd
+        integer :: stride, adr0, adr1, dd
         integer :: n_i, pos, ed
-        integer, allocatable :: count_i(:), count_i_aux(:), temp_a(:,:), map_j(:)
+        integer, allocatable :: count_i(:), count_i_aux(:), rows_(:), cols_(:)
         !---------------------------------------------------------
         ! Sort a first time with respect to first index using Count sort
         allocate( count_i( 0:num_rows ) , source = 0 )
@@ -188,29 +189,25 @@ module fsparse_sort
         end do
         allocate( count_i_aux( 0:num_rows ) , source = count_i )
 
-        allocate( temp_a( 2,n ) ) 
+        allocate( rows_(n), cols_(n) )
         do ed = n, 1, -1
             n_i = a(1,ed)
             pos = count_i(n_i)
-            temp_a(1:2,pos) = a(1:2,ed)
+            rows_(pos) = a(1,ed)
+            cols_(pos) = a(2,ed)
             count_i(n_i) = count_i(n_i) - 1
         end do
-        a(1:2,1:n) = temp_a(1:2,1:n)
         !---------------------------------------------------------
-        ! Sort with respect to second colum using std::sort
-        sze = num_cols
-        if( num_cols < 100 ) sze = 2*num_cols
-        allocate( map_j( sze ) , source = 0 )
+        ! Sort with respect to second colum
         do n_i = 1, num_rows
             adr0 = count_i_aux(n_i-1)+1
             adr1 = count_i_aux(n_i)
             dd = adr1-adr0+1
-            map_j(1:dd) = a(2,adr0:adr1)
-            call quicksort_i(map_j,1,dd)
-            a(2,adr0:adr1) = map_j(1:dd)
+            if(dd>0) call quicksort_i(cols_(adr0),1,dd)
         end do
         !---------------------------------------------------------
         ! Remove duplicates
+        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -222,19 +219,19 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_r_sp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_sp( a, data, n, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = real32 
-        real(wp), intent(inout) :: data(*)
+        integer, parameter :: wp = sp
+        real(sp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
         integer, intent(in) :: num_rows
         integer, intent(in) :: num_cols
 
-        integer :: stride, maxi, maxj, sze, adr0, adr1, dd
+        integer :: stride, adr0, adr1, dd
         integer :: n_i, pos, ed
-        integer, allocatable :: count_i(:), count_i_aux(:), temp_a(:,:), map_j(:)
-        real(wp), allocatable :: rtemp(:)
+        integer, allocatable :: count_i(:), count_i_aux(:), rows_(:), cols_(:)
+        real(sp), allocatable :: temp(:)
         !---------------------------------------------------------
         ! Sort a first time with respect to first index using Count sort
         allocate( count_i( 0:num_rows ) , source = 0 )
@@ -246,31 +243,27 @@ module fsparse_sort
         end do
         allocate( count_i_aux( 0:num_rows ) , source = count_i )
 
-        allocate( temp_a( 2,n ) , rtemp(n) ) 
+        allocate( rows_(n), cols_(n), temp(n) )
         do ed = n, 1, -1
             n_i = a(1,ed)
             pos = count_i(n_i)
-            temp_a(1:2,pos) = a(1:2,ed)
-            rtemp(pos) = data(ed)
+            rows_(pos) = a(1,ed)
+            cols_(pos) = a(2,ed)
+            temp(pos)  = data(ed)
             count_i(n_i) = count_i(n_i) - 1
         end do
-        a(1:2,1:n) = temp_a(1:2,1:n)
-        data(1:n) = rtemp(1:n)
         !---------------------------------------------------------
         ! Sort with respect to second colum using a quicksort
-        sze = num_cols
-        if( num_cols < 100 ) sze = 2*num_cols
-        allocate( map_j( sze ) , source = 0 )
         do n_i = 1, num_rows
             adr0 = count_i_aux(n_i-1)+1
             adr1 = count_i_aux(n_i)
             dd = adr1-adr0+1
-            map_j(1:dd) = a(2,adr0:adr1)
-            call quicksort_is(map_j,data(adr0),1,dd)
-            a(2,adr0:adr1) = map_j(1:dd)
+            if(dd>0) call quicksort_i_sp(cols_(adr0),temp(adr0),1,dd)
         end do
         !---------------------------------------------------------
         ! Remove duplicates
+        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        data(1:n) = temp(1:n)
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -284,19 +277,19 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_r_dp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_dp( a, data, n, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = real64
-        real(wp), intent(inout) :: data(*)
+        integer, parameter :: wp = dp
+        real(dp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
         integer, intent(in) :: num_rows
         integer, intent(in) :: num_cols
 
-        integer :: stride, maxi, maxj, sze, adr0, adr1, dd
+        integer :: stride, adr0, adr1, dd
         integer :: n_i, pos, ed
-        integer, allocatable :: count_i(:), count_i_aux(:), temp_a(:,:), map_j(:)
-        real(wp), allocatable :: rtemp(:)
+        integer, allocatable :: count_i(:), count_i_aux(:), rows_(:), cols_(:)
+        real(dp), allocatable :: temp(:)
         !---------------------------------------------------------
         ! Sort a first time with respect to first index using Count sort
         allocate( count_i( 0:num_rows ) , source = 0 )
@@ -308,31 +301,27 @@ module fsparse_sort
         end do
         allocate( count_i_aux( 0:num_rows ) , source = count_i )
 
-        allocate( temp_a( 2,n ) , rtemp(n) ) 
+        allocate( rows_(n), cols_(n), temp(n) )
         do ed = n, 1, -1
             n_i = a(1,ed)
             pos = count_i(n_i)
-            temp_a(1:2,pos) = a(1:2,ed)
-            rtemp(pos) = data(ed)
+            rows_(pos) = a(1,ed)
+            cols_(pos) = a(2,ed)
+            temp(pos)  = data(ed)
             count_i(n_i) = count_i(n_i) - 1
         end do
-        a(1:2,1:n) = temp_a(1:2,1:n)
-        data(1:n) = rtemp(1:n)
         !---------------------------------------------------------
         ! Sort with respect to second colum using a quicksort
-        sze = num_cols
-        if( num_cols < 100 ) sze = 2*num_cols
-        allocate( map_j( sze ) , source = 0 )
         do n_i = 1, num_rows
             adr0 = count_i_aux(n_i-1)+1
             adr1 = count_i_aux(n_i)
             dd = adr1-adr0+1
-            map_j(1:dd) = a(2,adr0:adr1)
-            call quicksort_id(map_j,data(adr0),1,dd)
-            a(2,adr0:adr1) = map_j(1:dd)
+            if(dd>0) call quicksort_i_dp(cols_(adr0),temp(adr0),1,dd)
         end do
         !---------------------------------------------------------
         ! Remove duplicates
+        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        data(1:n) = temp(1:n)
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -346,19 +335,19 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_c_sp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_csp( a, data, n, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = real32 
-        complex(wp), intent(inout) :: data(*)
+        integer, parameter :: wp = sp
+        complex(sp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
         integer, intent(in) :: num_rows
         integer, intent(in) :: num_cols
 
-        integer :: stride, maxi, maxj, sze, adr0, adr1, dd
+        integer :: stride, adr0, adr1, dd
         integer :: n_i, pos, ed
-        integer, allocatable :: count_i(:), count_i_aux(:), temp_a(:,:), map_j(:)
-        complex(wp), allocatable :: rtemp(:)
+        integer, allocatable :: count_i(:), count_i_aux(:), rows_(:), cols_(:)
+        complex(sp), allocatable :: temp(:)
         !---------------------------------------------------------
         ! Sort a first time with respect to first index using Count sort
         allocate( count_i( 0:num_rows ) , source = 0 )
@@ -370,31 +359,27 @@ module fsparse_sort
         end do
         allocate( count_i_aux( 0:num_rows ) , source = count_i )
 
-        allocate( temp_a( 2,n ) , rtemp(n) ) 
+        allocate( rows_(n), cols_(n), temp(n) )
         do ed = n, 1, -1
             n_i = a(1,ed)
             pos = count_i(n_i)
-            temp_a(1:2,pos) = a(1:2,ed)
-            rtemp(pos) = data(ed)
+            rows_(pos) = a(1,ed)
+            cols_(pos) = a(2,ed)
+            temp(pos)  = data(ed)
             count_i(n_i) = count_i(n_i) - 1
         end do
-        a(1:2,1:n) = temp_a(1:2,1:n)
-        data(1:n) = rtemp(1:n)
         !---------------------------------------------------------
         ! Sort with respect to second colum using a quicksort
-        sze = num_cols
-        if( num_cols < 100 ) sze = 2*num_cols
-        allocate( map_j( sze ) , source = 0 )
         do n_i = 1, num_rows
             adr0 = count_i_aux(n_i-1)+1
             adr1 = count_i_aux(n_i)
             dd = adr1-adr0+1
-            map_j(1:dd) = a(2,adr0:adr1)
-            call quicksort_ic(map_j,data(adr0),1,dd)
-            a(2,adr0:adr1) = map_j(1:dd)
+            if(dd>0) call quicksort_i_csp(cols_(adr0),temp(adr0),1,dd)
         end do
         !---------------------------------------------------------
         ! Remove duplicates
+        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        data(1:n) = temp(1:n)
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -408,19 +393,19 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
-    subroutine sort_coo_unique_c_dp( a, n, data, num_rows, num_cols )
+    subroutine sort_coo_unique_cdp( a, data, n, num_rows, num_cols )
         !! Sort a 2d array in increasing order first by index 1 and then by index 2
-        integer, parameter :: wp = real64
-        complex(wp), intent(inout) :: data(*)
+        integer, parameter :: wp = dp
+        complex(dp), intent(inout) :: data(*)
         integer, intent(inout) :: a(2,*)
         integer, intent(inout) :: n
         integer, intent(in) :: num_rows
         integer, intent(in) :: num_cols
 
-        integer :: stride, maxi, maxj, sze, adr0, adr1, dd
+        integer :: stride, adr0, adr1, dd
         integer :: n_i, pos, ed
-        integer, allocatable :: count_i(:), count_i_aux(:), temp_a(:,:), map_j(:)
-        complex(wp), allocatable :: rtemp(:)
+        integer, allocatable :: count_i(:), count_i_aux(:), rows_(:), cols_(:)
+        complex(dp), allocatable :: temp(:)
         !---------------------------------------------------------
         ! Sort a first time with respect to first index using Count sort
         allocate( count_i( 0:num_rows ) , source = 0 )
@@ -432,31 +417,27 @@ module fsparse_sort
         end do
         allocate( count_i_aux( 0:num_rows ) , source = count_i )
 
-        allocate( temp_a( 2,n ) , rtemp(n) ) 
+        allocate( rows_(n), cols_(n), temp(n) )
         do ed = n, 1, -1
             n_i = a(1,ed)
             pos = count_i(n_i)
-            temp_a(1:2,pos) = a(1:2,ed)
-            rtemp(pos) = data(ed)
+            rows_(pos) = a(1,ed)
+            cols_(pos) = a(2,ed)
+            temp(pos)  = data(ed)
             count_i(n_i) = count_i(n_i) - 1
         end do
-        a(1:2,1:n) = temp_a(1:2,1:n)
-        data(1:n) = rtemp(1:n)
         !---------------------------------------------------------
         ! Sort with respect to second colum using a quicksort
-        sze = num_cols
-        if( num_cols < 100 ) sze = 2*num_cols
-        allocate( map_j( sze ) , source = 0 )
         do n_i = 1, num_rows
             adr0 = count_i_aux(n_i-1)+1
             adr1 = count_i_aux(n_i)
             dd = adr1-adr0+1
-            map_j(1:dd) = a(2,adr0:adr1)
-            call quicksort_iz(map_j,data(adr0),1,dd)
-            a(2,adr0:adr1) = map_j(1:dd)
+            if(dd>0) call quicksort_i_cdp(cols_(adr0),temp(adr0),1,dd)
         end do
         !---------------------------------------------------------
         ! Remove duplicates
+        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        data(1:n) = temp(1:n)
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -470,95 +451,54 @@ module fsparse_sort
         n = n - stride
     end subroutine
 
+
+    subroutine coo2ordered(COO)
+        class(COO_t), intent(inout) :: COO
+        integer, allocatable :: itemp(:,:)
+        
+        if(COO%isOrdered) return
+        
+        select type (coo)
+            type is( coo_t )
+                call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
+            type is( coo_sp )
+                block
+                real(sp), allocatable :: temp(:)
+                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                
+                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                call move_alloc( temp , COO%data )
+                end block
+            type is( coo_dp )
+                block
+                real(dp), allocatable :: temp(:)
+                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                
+                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                call move_alloc( temp , COO%data )
+                end block
+            type is( coo_csp )
+                block
+                complex(sp), allocatable :: temp(:)
+                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                
+                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                call move_alloc( temp , COO%data )
+                end block
+            type is( coo_cdp )
+                block
+                complex(dp), allocatable :: temp(:)
+                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                
+                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                call move_alloc( temp , COO%data )
+                end block
+        end select
+        
+        allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
+        call move_alloc( itemp , COO%index )
+
+        COO%isOrdered = .true.
+    end subroutine
     
-    subroutine coo2ordered_i(COO)
-        type(COO_t), intent(inout) :: COO
-        integer, allocatable :: itemp(:,:)
-
-        if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
-
-            allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
-            call move_alloc( itemp , COO%index )
-
-            COO%isOrdered = .true.
-        end if
-    end subroutine
-
-    subroutine coo2ordered_r_s(COO)
-        integer, parameter :: wp = real32
-        type(COOr32_t), intent(inout) :: COO
-        integer, allocatable :: itemp(:,:)
-        real(wp), allocatable :: rtemp(:)
-
-        if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
-
-            allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
-            call move_alloc( itemp , COO%index )
-
-            allocate( rtemp(COO%nnz) , source=COO%data(1:COO%nnz) )
-            call move_alloc( rtemp , COO%data )
-
-            COO%isOrdered = .true.
-        end if
-    end subroutine
-
-    subroutine coo2ordered_r_d(COO)
-        integer, parameter :: wp = real64
-        type(COOr64_t), intent(inout) :: COO
-        integer, allocatable :: itemp(:,:)
-        real(wp), allocatable :: rtemp(:)
-
-        if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
-
-            allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
-            call move_alloc( itemp , COO%index )
-
-            allocate( rtemp(COO%nnz) , source=COO%data(1:COO%nnz) )
-            call move_alloc( rtemp , COO%data )
-
-            COO%isOrdered = .true.
-        end if
-    end subroutine
-
-    subroutine coo2ordered_c_s(COO)
-        integer, parameter :: wp = real32
-        type(COOc32_t), intent(inout) :: COO
-        integer, allocatable :: itemp(:,:)
-        complex(wp), allocatable :: ctemp(:)
-
-        if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
-
-            allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
-            call move_alloc( itemp , COO%index )
-
-            allocate( ctemp(COO%nnz) , source=COO%data(1:COO%nnz) )
-            call move_alloc( ctemp , COO%data )
-
-            COO%isOrdered = .true.
-        end if
-    end subroutine
-
-    subroutine coo2ordered_c_d(COO)
-        integer, parameter :: wp = real64
-        type(COOc64_t), intent(inout) :: COO
-        integer, allocatable :: itemp(:,:)
-        complex(wp), allocatable :: ztemp(:)
-
-        if(.not.COO%isOrdered) then
-            call sort_coo(COO%index, COO%nnz, COO%data, COO%nrows, COO%ncols)
-
-            allocate( itemp(2,COO%nnz) , source=COO%index(1:2,1:COO%nnz) )
-            call move_alloc( itemp , COO%index )
-
-            allocate( ztemp(COO%nnz) , source=COO%data(1:COO%nnz) )
-            call move_alloc( ztemp , COO%data )
-
-            COO%isOrdered = .true.
-        end if
-    end subroutine
-
 end module fsparse_sort

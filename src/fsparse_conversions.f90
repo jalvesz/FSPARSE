@@ -1,51 +1,49 @@
-!---------------------------------------------------
-! Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
-!
-! Use of this source code is governed by a MIT
-! license that can be found in the LICENSE.md file
-!---------------------------------------------------
+!>---------------------------------------------------
+!> Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
+!>
+!> Use of this source code is governed by a MIT
+!> license that can be found in the LICENSE.md file
+!>---------------------------------------------------
 module fsparse_conversions
-    use iso_fortran_env
+    use fsparse_constants
     use fsparse_matrix_gallery
-    use fsparse_sort
     implicit none
     
     interface dense2coo
-        module procedure dense2coo_r_sp
-        module procedure dense2coo_r_dp
-        module procedure dense2coo_c_sp
-        module procedure dense2coo_c_dp
+        module procedure dense2coo_sp
+        module procedure dense2coo_dp
+        module procedure dense2coo_csp
+        module procedure dense2coo_cdp
     end interface
 
     interface coo2dense
-        module procedure coo2dense_r_sp
-        module procedure coo2dense_r_dp
-        module procedure coo2dense_c_sp
-        module procedure coo2dense_c_dp
+        module procedure coo2dense_sp
+        module procedure coo2dense_dp
+        module procedure coo2dense_csp
+        module procedure coo2dense_cdp
     end interface
 
     interface coo2csr
         module procedure coo2csr_ordered
-        module procedure coo2csr_ordered_r_sp
-        module procedure coo2csr_ordered_r_dp
-        module procedure coo2csr_ordered_c_sp
-        module procedure coo2csr_ordered_c_dp
+        module procedure coo2csr_ordered_sp
+        module procedure coo2csr_ordered_dp
+        module procedure coo2csr_ordered_csp
+        module procedure coo2csr_ordered_cdp
     end interface
 
     interface csr2coo
         module procedure csr2coo
-        module procedure csr2coo_r_sp
-        module procedure csr2coo_r_dp
-        module procedure csr2coo_c_sp
-        module procedure csr2coo_c_dp
+        module procedure csr2coo_sp
+        module procedure csr2coo_dp
+        module procedure csr2coo_csp
+        module procedure csr2coo_cdp
     end interface
 
 contains
-
-    subroutine dense2coo_r_sp(dense,COO)
-        integer, parameter :: wp = real32
-        real(wp), intent(in) :: dense(:,:)
-        type(COOr32_t), intent(inout) :: COO
+    subroutine dense2coo_sp(dense,COO)
+        integer, parameter :: wp = sp
+        real(sp), intent(in) :: dense(:,:)
+        type(COO_sp), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
         integer :: i, j, idx
 
@@ -68,10 +66,10 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_r_dp(dense,COO)
-        integer, parameter :: wp = real64
-        real(wp), intent(in) :: dense(:,:)
-        type(COOr64_t), intent(inout) :: COO
+    subroutine dense2coo_dp(dense,COO)
+        integer, parameter :: wp = dp
+        real(dp), intent(in) :: dense(:,:)
+        type(COO_dp), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
         integer :: i, j, idx
 
@@ -94,10 +92,10 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_c_sp(dense,COO)
-        integer, parameter :: wp = real32
-        complex(wp), intent(in) :: dense(:,:)
-        type(COOc32_t), intent(inout) :: COO
+    subroutine dense2coo_csp(dense,COO)
+        integer, parameter :: wp = sp
+        complex(sp), intent(in) :: dense(:,:)
+        type(COO_csp), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
         integer :: i, j, idx
 
@@ -120,10 +118,10 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
-    subroutine dense2coo_c_dp(dense,COO)
-        integer, parameter :: wp = real64
-        complex(wp), intent(in) :: dense(:,:)
-        type(COOc64_t), intent(inout) :: COO
+    subroutine dense2coo_cdp(dense,COO)
+        integer, parameter :: wp = dp
+        complex(dp), intent(in) :: dense(:,:)
+        type(COO_cdp), intent(inout) :: COO
         integer :: num_rows, num_cols, nnz
         integer :: i, j, idx
 
@@ -145,11 +143,12 @@ contains
         end do
         COO%isOrdered = .true.
     end subroutine
+
     
-    subroutine coo2dense_r_sp(COO,dense)
-        integer, parameter :: wp = real32
-        type(COOr32_t), intent(in) :: COO
-        real(wp), intent(inout) :: dense(:,:)
+    subroutine coo2dense_sp(COO,dense)
+        integer, parameter :: wp = sp
+        type(COO_sp), intent(in) :: COO
+        real(sp), intent(inout) :: dense(:,:)
         integer :: idx
 
         do concurrent(idx = 1:COO%NNZ)
@@ -157,21 +156,10 @@ contains
         end do
     end subroutine
 
-    subroutine coo2dense_r_dp(COO,dense)
-        integer, parameter :: wp = real64
-        type(COOr64_t), intent(in) :: COO
-        real(wp), intent(inout) :: dense(:,:)
-        integer :: idx
-
-        do concurrent(idx = 1:COO%NNZ)
-            dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
-        end do
-    end subroutine
-    
-    subroutine coo2dense_c_sp(COO,dense)
-        integer, parameter :: wp = real32
-        type(COOc32_t), intent(in) :: COO
-        complex(wp), intent(inout) :: dense(:,:)
+    subroutine coo2dense_dp(COO,dense)
+        integer, parameter :: wp = dp
+        type(COO_dp), intent(in) :: COO
+        real(dp), intent(inout) :: dense(:,:)
         integer :: idx
 
         do concurrent(idx = 1:COO%NNZ)
@@ -179,16 +167,28 @@ contains
         end do
     end subroutine
 
-    subroutine coo2dense_c_dp(COO,dense)
-        integer, parameter :: wp = real64
-        type(COOc64_t), intent(in) :: COO
-        complex(wp), intent(inout) :: dense(:,:)
+    subroutine coo2dense_csp(COO,dense)
+        integer, parameter :: wp = sp
+        type(COO_csp), intent(in) :: COO
+        complex(sp), intent(inout) :: dense(:,:)
         integer :: idx
 
         do concurrent(idx = 1:COO%NNZ)
             dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
         end do
     end subroutine
+
+    subroutine coo2dense_cdp(COO,dense)
+        integer, parameter :: wp = dp
+        type(COO_cdp), intent(in) :: COO
+        complex(dp), intent(inout) :: dense(:,:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
 
     subroutine coo2csr_ordered(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
@@ -219,11 +219,11 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_r_sp(COO,CSR)
+    subroutine coo2csr_ordered_sp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
-        type(COOr32_t), intent(in)    :: COO
-        type(CSRr32_t), intent(inout) :: CSR
+        type(COO_sp), intent(in)    :: COO
+        type(CSR_sp), intent(inout) :: CSR
         integer :: i
 
         associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
@@ -250,11 +250,11 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_r_dp(COO,CSR)
+    subroutine coo2csr_ordered_dp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
-        type(COOr64_t), intent(in)    :: COO
-        type(CSRr64_t), intent(inout) :: CSR
+        type(COO_dp), intent(in)    :: COO
+        type(CSR_dp), intent(inout) :: CSR
         integer :: i
 
         associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
@@ -281,12 +281,11 @@ contains
         end associate
     end subroutine
 
-
-    subroutine coo2csr_ordered_c_sp(COO,CSR)
+    subroutine coo2csr_ordered_csp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
-        type(COOc32_t), intent(in)    :: COO
-        type(CSRc32_t), intent(inout) :: CSR
+        type(COO_csp), intent(in)    :: COO
+        type(CSR_csp), intent(inout) :: CSR
         integer :: i
 
         associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
@@ -313,11 +312,11 @@ contains
         end associate
     end subroutine
 
-    subroutine coo2csr_ordered_c_dp(COO,CSR)
+    subroutine coo2csr_ordered_cdp(COO,CSR)
         !! coo2csr_ordered: This function enables transfering data from a COO matrix to a CSR matrix
         !! under the hypothesis that the COO is already ordered.
-        type(COOc64_t), intent(in)    :: COO
-        type(CSRc64_t), intent(inout) :: CSR
+        type(COO_cdp), intent(in)    :: COO
+        type(CSR_cdp), intent(inout) :: CSR
         integer :: i
 
         associate( nnz=>COO%nnz, num_rows=>COO%nrows, num_cols=>COO%ncols, base=>COO%base, sym=>COO%sym )
@@ -363,10 +362,10 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_r_sp(CSR,COO)
+    subroutine csr2coo_sp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
-        type(CSRr32_t), intent(in)    :: CSR
-        type(COOr32_t), intent(inout) :: COO
+        type(CSR_sp), intent(in)    :: CSR
+        type(COO_sp), intent(inout) :: COO
         integer :: i, j
 
         COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
@@ -387,34 +386,10 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_r_dp(CSR,COO)
+    subroutine csr2coo_dp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
-        type(CSRr64_t), intent(in)    :: CSR
-        type(COOr64_t), intent(inout) :: COO
-        integer :: i, j
-
-        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
-        COO%base = CSR%base; COO%sym = CSR%sym
-
-        if( .not.allocated(COO%data) ) then
-            allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
-        else 
-            COO%data(1:CSR%NNZ) = CSR%data(1:CSR%NNZ)
-        end if
-
-        if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
-
-        do i = 1, CSR%nrows
-            do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
-                COO%index(1:2,j) = [i,CSR%col(j)]
-            end do
-        end do
-    end subroutine
-
-    subroutine csr2coo_c_sp(CSR,COO)
-        !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
-        type(CSRc32_t), intent(in)    :: CSR
-        type(COOc32_t), intent(inout) :: COO
+        type(CSR_dp), intent(in)    :: CSR
+        type(COO_dp), intent(inout) :: COO
         integer :: i, j
 
         COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
@@ -435,10 +410,10 @@ contains
         end do
     end subroutine
 
-    subroutine csr2coo_c_dp(CSR,COO)
+    subroutine csr2coo_csp(CSR,COO)
         !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
-        type(CSRc64_t), intent(in)    :: CSR
-        type(COOc64_t), intent(inout) :: COO
+        type(CSR_csp), intent(in)    :: CSR
+        type(COO_csp), intent(inout) :: COO
         integer :: i, j
 
         COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
@@ -451,12 +426,37 @@ contains
         end if
 
         if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
-
+        
         do i = 1, CSR%nrows
             do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
                 COO%index(1:2,j) = [i,CSR%col(j)]
             end do
         end do
     end subroutine
+
+    subroutine csr2coo_cdp(CSR,COO)
+        !! csr2coo: This function enables transfering data from a CSR matrix to a COO matrix
+        type(CSR_cdp), intent(in)    :: CSR
+        type(COO_cdp), intent(inout) :: COO
+        integer :: i, j
+
+        COO%NNZ = CSR%NNZ; COO%nrows = CSR%nrows; COO%ncols = CSR%ncols
+        COO%base = CSR%base; COO%sym = CSR%sym
+
+        if( .not.allocated(COO%data) ) then
+            allocate( COO%data(CSR%NNZ) , source = CSR%data(1:CSR%NNZ) )
+        else 
+            COO%data(1:CSR%NNZ) = CSR%data(1:CSR%NNZ)
+        end if
+
+        if( .not.allocated(COO%index) ) allocate( COO%index(2,CSR%NNZ) )
+        
+        do i = 1, CSR%nrows
+            do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                COO%index(1:2,j) = [i,CSR%col(j)]
+            end do
+        end do
+    end subroutine
+
     
 end module fsparse_conversions
