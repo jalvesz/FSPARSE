@@ -12,10 +12,12 @@ module fsparse_matrix_gallery
     implicit none
     private
   
-    public :: COO_t, COOr32_t, COOr64_t
-    public :: CSR_t, CSRr32_t, CSRr64_t
-    public :: CSC_t, CSCr32_t, CSCr64_t
-    public :: ELL_t, ELLr32_t, ELLr64_t
+    public :: COO_t, COOr32_t, COOr64_t, COOc32_t, COOc64_t
+    public :: CSR_t, CSRr32_t, CSRr64_t, CSRc32_t, CSRc64_t
+    public :: CSC_t, CSCr32_t, CSCr64_t, CSCc32_t, CSCc64_t
+    public :: ELL_t, ELLr32_t, ELLr64_t, ELLc32_t, ELLc64_t
+
+    
     ! -- Global parameters
     integer, parameter, public :: k_NOSYMMETRY = 0 !! Full Sparse matrix (no symmetry considerations)
     integer, parameter, public :: k_SYMTRIINF = 1  !! Symmetric Sparse matrix with triangular inferior storage
@@ -44,6 +46,14 @@ module fsparse_matrix_gallery
     type, extends(COO_t) :: COOr64_t
       real(dp), allocatable :: data(:) !! double precision values
     end type
+   
+    type, extends(COO_t) :: COOc32_t
+      complex(sp), allocatable :: data(:) !! single precision values
+    end type
+  
+    type, extends(COO_t) :: COOc64_t
+      complex(dp), allocatable :: data(:) !! double precision values
+    end type
   
     !! CSR: Compressed sparse row or Yale format
     type, extends(sparse_t) :: CSR_t  
@@ -61,6 +71,15 @@ module fsparse_matrix_gallery
       real(dp), allocatable :: data(:)   !! double precision values
     end type
   
+    type, extends(CSR_t) :: CSRc32_t
+      complex(sp), allocatable :: data(:)   !! single precision values
+    end type
+  
+    type, extends(CSR_t) :: CSRc64_t 
+      complex(dp), allocatable :: data(:)   !! double precision values
+    end type
+  
+
     !! CSC: Compressed sparse column
     type, extends(sparse_t) :: CSC_t  
       integer, allocatable  :: colptr(:) !! matrix column pointer
@@ -75,6 +94,14 @@ module fsparse_matrix_gallery
   
     type, extends(CSC_t) :: CSCr64_t 
       real(dp), allocatable :: data(:)   !! double precision values
+    end type
+  
+    type, extends(CSC_t) :: CSCc32_t 
+      complex(sp), allocatable :: data(:)   !! single precision values
+    end type
+  
+    type, extends(CSC_t) :: CSCc64_t 
+      complex(dp), allocatable :: data(:)   !! double precision values
     end type
   
     !! Compressed ELLPACK
@@ -93,6 +120,15 @@ module fsparse_matrix_gallery
       real(dp), allocatable :: data(:,:) !! double precision values
     end type
   
+  
+    type, extends(ELL_t) :: ELLc32_t 
+      complex(sp), allocatable :: data(:,:) !! single precision values
+    end type
+  
+    type, extends(ELL_t) :: ELLc64_t 
+      complex(dp), allocatable :: data(:,:) !! double precision values
+    end type
+  
   contains
   
   subroutine malloc_coo(self,num_rows,num_cols,nnz)
@@ -104,7 +140,9 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:,:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
-  
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
+      
       self%nrows = num_rows
       self%ncols = num_cols
       self%NNZ = nnz
@@ -131,6 +169,20 @@ module fsparse_matrix_gallery
                   allocate(dtemp(nnz) , source = self%data )
               end if
               call move_alloc(from=dtemp,to=self%data)
+          type is(COOc32_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ctemp(nnz) , source = (0._sp,0._sp) )
+              else
+                  allocate(ctemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ctemp,to=self%data)
+          type is(COOc64_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ztemp(nnz) , source = (0._dp,0._dp) )
+              else
+                  allocate(ztemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ztemp,to=self%data)
       end select
   end subroutine
   
@@ -143,6 +195,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
   
       self%nrows = num_rows
       self%ncols = num_cols
@@ -177,6 +231,20 @@ module fsparse_matrix_gallery
                   allocate(dtemp(nnz) , source = self%data )
               end if
               call move_alloc(from=dtemp,to=self%data)
+          type is(CSRc32_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ctemp(nnz) , source = (0._sp,0._sp) )
+              else
+                  allocate(ctemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ctemp,to=self%data)
+          type is(CSRc64_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ztemp(nnz) , source = (0._dp,0._dp) )
+              else
+                  allocate(ztemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ztemp,to=self%data)
       end select
   end subroutine
   
@@ -189,6 +257,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:)
       real(sp), allocatable :: stemp(:)
       real(dp), allocatable :: dtemp(:)
+      complex(sp),allocatable:: ctemp(:)
+      complex(dp),allocatable:: ztemp(:)
   
       self%nrows = num_rows
       self%ncols = num_cols
@@ -223,6 +293,20 @@ module fsparse_matrix_gallery
                   allocate(dtemp(nnz) , source = self%data )
               end if
               call move_alloc(from=dtemp,to=self%data)
+          type is(CSCc32_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ctemp(nnz) , source = (0._sp,0._sp) )
+              else
+                  allocate(ctemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ctemp,to=self%data)
+          type is(CSCc64_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ztemp(nnz) , source = (0._dp,0._dp) )
+              else
+                  allocate(ztemp(nnz) , source = self%data )
+              end if
+              call move_alloc(from=ztemp,to=self%data)
       end select
   end subroutine
   
@@ -235,6 +319,8 @@ module fsparse_matrix_gallery
       integer,  allocatable :: itemp(:,:)
       real(sp), allocatable :: stemp(:,:)
       real(dp), allocatable :: dtemp(:,:)
+      complex(sp),allocatable:: ctemp(:,:)
+      complex(dp),allocatable:: ztemp(:,:)
   
       self%nrows = num_rows
       self%ncols = num_cols
@@ -262,6 +348,20 @@ module fsparse_matrix_gallery
                   allocate(dtemp(num_rows,num_nz_rows) , source = self%data )
               end if
               call move_alloc(from=dtemp,to=self%data)
+          type is(ELLc32_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ctemp(num_rows,num_nz_rows) , source = (0._sp,0._sp) )
+              else
+                  allocate(ctemp(num_rows,num_nz_rows) , source = self%data )
+              end if
+              call move_alloc(from=ctemp,to=self%data)
+          type is(ELLc64_t)
+              if(.not.allocated(self%data)) then
+                  allocate(ztemp(num_rows,num_nz_rows) , source = (0._dp,0._dp) )
+              else
+                  allocate(ztemp(num_rows,num_nz_rows) , source = self%data )
+              end if
+              call move_alloc(from=ztemp,to=self%data)
       end select
   end subroutine
 
