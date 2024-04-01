@@ -5,7 +5,7 @@ module fsparse_constants
     private
     public :: hp, sp, dp, xdp, qp, int8, int16, int32, int64
 
-    !> Extended double precision real numbers
+    !> half precision real numbers
     integer, parameter :: hp = #{if WITH_HP}#selected_real_kind(3)#{else}#-1#{endif}#
     
     !> Single precision real numbers
