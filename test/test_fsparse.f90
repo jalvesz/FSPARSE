@@ -1,5 +1,4 @@
 module test_fsparse
-    use, intrinsic :: iso_fortran_env, only: sp=>real32, dp=>real64
     use testdrive, only: new_unittest, unittest_type, error_type, check
     use fsparse
     implicit none
@@ -26,7 +25,7 @@ module test_fsparse
         type(error_type), allocatable, intent(out) :: error
 
         real(sp), allocatable :: dense(:,:)
-        type(COOr32_t) :: COO
+        type(COO_sp) :: COO
         real(sp), allocatable :: vec_x(:)
         real(sp), allocatable :: vec_y1(:), vec_y2(:)
 
@@ -48,7 +47,7 @@ module test_fsparse
         call check(error, all(vec_y1 == [6.0,11.0,15.0,15.0]) )
         if (allocated(error)) return
 
-        call matvec( COO , vec_x, vec_y2 )
+        call matvec( COO, vec_x, vec_y2 )
         call check(error, all(vec_y1 == vec_y2) )
         if (allocated(error)) return
         
@@ -57,7 +56,7 @@ module test_fsparse
     subroutine test_coo2ordered(error)
         !> Error handling
         type(error_type), allocatable, intent(out) :: error
-        type(COOr32_t) :: COO
+        type(COO_sp) :: COO
 
         call COO%malloc(4,4,12)
         COO%data(:) = 1
@@ -93,7 +92,7 @@ module test_fsparse
     subroutine test_csr(error)
         !> Error handling
         type(error_type), allocatable, intent(out) :: error
-        type(CSRr64_t) :: CSR
+        type(CSR_dp) :: CSR
         real(dp), allocatable :: vec_x(:)
         real(dp), allocatable :: vec_y(:)
 
@@ -104,7 +103,7 @@ module test_fsparse
         
         allocate( vec_x(5) , source = 1._dp )
         allocate( vec_y(4) , source = 0._dp )
-        call matvec( CSR , vec_x , vec_y )
+        call matvec( CSR, vec_x, vec_y )
         
         call check(error, all(vec_y == dble([6.0,11.0,15.0,15.0])) )
         if (allocated(error)) return
@@ -114,7 +113,7 @@ module test_fsparse
     subroutine test_csc(error)
         !> Error handling
         type(error_type), allocatable, intent(out) :: error
-        type(CSCr64_t) :: CSC
+        type(CSC_dp) :: CSC
         real(dp), allocatable :: vec_x(:)
         real(dp), allocatable :: vec_y(:)
 
@@ -125,7 +124,7 @@ module test_fsparse
         
         allocate( vec_x(5) , source = 1._dp )
         allocate( vec_y(4) , source = 0._dp )
-        call matvec( CSC , vec_x , vec_y )
+        call matvec( CSC, vec_x, vec_y )
 
         call check(error, all(vec_y == dble([6.0,11.0,15.0,15.0])) )
         if (allocated(error)) return
@@ -135,7 +134,7 @@ module test_fsparse
     subroutine test_ell(error)
         !> Error handling
         type(error_type), allocatable, intent(out) :: error
-        type(ELLr32_t) :: ELL
+        type(ELL_sp) :: ELL
         real(sp), allocatable :: vec_x(:)
         real(sp), allocatable :: vec_y(:)
 
@@ -152,7 +151,7 @@ module test_fsparse
         
         allocate( vec_x(5) , source = 1._sp )
         allocate( vec_y(4) , source = 0._sp )
-        call matvec( ELL , vec_x , vec_y )
+        call matvec( ELL , vec_x, vec_y )
 
         call check(error, all(vec_y == [6.0,11.0,15.0,15.0]) )
         if (allocated(error)) return
@@ -164,8 +163,8 @@ module test_fsparse
         type(error_type), allocatable, intent(out) :: error
 
         real(sp), allocatable :: dense(:,:)
-        type(COOr32_t) :: COO
-        type(CSRr32_t) :: CSR
+        type(COO_sp) :: COO
+        type(CSR_sp) :: CSR
         real(sp), allocatable :: vec_x(:)
         real(sp), allocatable :: vec_y1(:), vec_y2(:), vec_y3(:)
 
@@ -182,10 +181,10 @@ module test_fsparse
 
         call dense2coo( dense , COO )
         COO%sym = k_SYMTRISUP
+        call coo2csr(COO, CSR)
 
         dense(2,1) = 2.0; dense(3,2) = 2.0; dense(4,3) = 2.0
         vec_y1 = matmul( dense, vec_x )
-
         call check(error, all(vec_y1 == [3.0,5.0,5.0,3.0]) )
         if (allocated(error)) return
 
@@ -193,7 +192,6 @@ module test_fsparse
         call check(error, all(vec_y1 == vec_y2) )
         if (allocated(error)) return
 
-        call coo2csr(COO, CSR)
         call matvec( CSR , vec_x, vec_y3 )
         call check(error, all(vec_y1 == vec_y3) )
         if (allocated(error)) return
