@@ -125,14 +125,6 @@ module fsparse_matrix_gallery
         procedure :: set => set_value_csc_cdp
     end type
   
-    type, extends(CSC_t) :: CSCc32_t 
-      complex(sp), allocatable :: data(:)   !! single precision values
-    end type
-  
-    type, extends(CSC_t) :: CSCc64_t 
-      complex(dp), allocatable :: data(:)   !! double precision values
-    end type
-  
     !! Compressed ELLPACK
     type, public, extends(sparse_t) :: ELL_t 
       integer               :: K = 0 !! maximum number of nonzeros per row
