@@ -181,7 +181,9 @@ module fsparse_sort
         end do
         !---------------------------------------------------------
         ! Remove duplicates
-        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        do ed = 1,n
+            a(1:2,ed) = [rows_(ed),cols_(ed)]
+        end do
         data(1:n) = temp(1:n)
         stride = 0
         do ed = 2, n
