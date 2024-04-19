@@ -17,9 +17,21 @@ module fsparse_conversions
     #:endfor
     end interface
 
+    interface dense2diagonal
+    #:for k1, t1, s1 in (KINDS_TYPES)
+        module procedure dense2diagonal_${s1}$
+    #:endfor
+    end interface
+
     interface coo2dense
     #:for k1, t1, s1 in (KINDS_TYPES)
         module procedure coo2dense_${s1}$
+    #:endfor
+    end interface
+
+    interface coo2diagonal
+    #:for k1, t1, s1 in (KINDS_TYPES)
+        module procedure coo2diagonal_${s1}$
     #:endfor
     end interface
 
@@ -34,6 +46,12 @@ module fsparse_conversions
         module procedure csr2coo
     #:for k1, t1, s1 in (KINDS_TYPES)
         module procedure csr2coo_${s1}$
+    #:endfor
+    end interface
+
+    interface csr2diagonal
+    #:for k1, t1, s1 in (KINDS_TYPES)
+        module procedure csr2diagonal_${s1}$
     #:endfor
     end interface
 
@@ -66,6 +84,21 @@ contains
     end subroutine
 
     #:endfor
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine dense2diagonal_${s1}$(dense,diagonal)
+        ${t1}$, intent(in) :: dense(:,:)
+        ${t1}$, intent(inout) :: diagonal(:)
+        integer :: num_rows
+        integer :: i
+
+        num_rows = size(dense,dim=1)
+        do concurrent(i = 1:num_rows)
+            diagonal(i) = dense(i,i)
+        end do
+    end subroutine
+
+    #:endfor
     
     #:for k1, t1, s1 in (KINDS_TYPES)
     subroutine coo2dense_${s1}$(COO,dense)
@@ -76,6 +109,21 @@ contains
 
         do concurrent(idx = 1:COO%NNZ)
             dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+    #:endfor
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine coo2diagonal_${s1}$(COO,diagonal)
+        integer, parameter :: wp = ${k1}$
+        type(COO_${s1}$), intent(in) :: COO
+        ${t1}$, intent(inout) :: diagonal(:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            if(COO%index(1,idx)==COO%index(2,idx)) &
+            & diagonal( COO%index(1,idx) ) = COO%data(idx)
         end do
     end subroutine
 
@@ -185,6 +233,35 @@ contains
                 COO%index(1:2,j) = [i,CSR%col(j)]
             end do
         end do
+    end subroutine
+
+    #:endfor
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine csr2diagonal_${s1}$(CSR,diagonal)
+        integer, parameter :: wp = ${k1}$
+        type(CSR_${s1}$), intent(in) :: CSR
+        ${t1}$, intent(inout) :: diagonal(:)
+        integer :: i, j
+        select case(CSR%sym)
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i+1)-1 )
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i) )
+            end do
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                    if( CSR%col(j) == i ) then
+                        diagonal(i) = CSR%data(j)
+                        exit
+                    end if
+                end do
+            end do
+        end select
     end subroutine
 
     #:endfor

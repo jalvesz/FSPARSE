@@ -16,11 +16,25 @@ module fsparse_conversions
         module procedure dense2coo_cdp
     end interface
 
+    interface dense2diagonal
+        module procedure dense2diagonal_sp
+        module procedure dense2diagonal_dp
+        module procedure dense2diagonal_csp
+        module procedure dense2diagonal_cdp
+    end interface
+
     interface coo2dense
         module procedure coo2dense_sp
         module procedure coo2dense_dp
         module procedure coo2dense_csp
         module procedure coo2dense_cdp
+    end interface
+
+    interface coo2diagonal
+        module procedure coo2diagonal_sp
+        module procedure coo2diagonal_dp
+        module procedure coo2diagonal_csp
+        module procedure coo2diagonal_cdp
     end interface
 
     interface coo2csr
@@ -37,6 +51,13 @@ module fsparse_conversions
         module procedure csr2coo_dp
         module procedure csr2coo_csp
         module procedure csr2coo_cdp
+    end interface
+
+    interface csr2diagonal
+        module procedure csr2diagonal_sp
+        module procedure csr2diagonal_dp
+        module procedure csr2diagonal_csp
+        module procedure csr2diagonal_cdp
     end interface
 
 contains
@@ -144,6 +165,55 @@ contains
         COO%isOrdered = .true.
     end subroutine
 
+
+    subroutine dense2diagonal_sp(dense,diagonal)
+        real(sp), intent(in) :: dense(:,:)
+        real(sp), intent(inout) :: diagonal(:)
+        integer :: num_rows
+        integer :: i
+
+        num_rows = size(dense,dim=1)
+        do concurrent(i = 1:num_rows)
+            diagonal(i) = dense(i,i)
+        end do
+    end subroutine
+
+    subroutine dense2diagonal_dp(dense,diagonal)
+        real(dp), intent(in) :: dense(:,:)
+        real(dp), intent(inout) :: diagonal(:)
+        integer :: num_rows
+        integer :: i
+
+        num_rows = size(dense,dim=1)
+        do concurrent(i = 1:num_rows)
+            diagonal(i) = dense(i,i)
+        end do
+    end subroutine
+
+    subroutine dense2diagonal_csp(dense,diagonal)
+        complex(sp), intent(in) :: dense(:,:)
+        complex(sp), intent(inout) :: diagonal(:)
+        integer :: num_rows
+        integer :: i
+
+        num_rows = size(dense,dim=1)
+        do concurrent(i = 1:num_rows)
+            diagonal(i) = dense(i,i)
+        end do
+    end subroutine
+
+    subroutine dense2diagonal_cdp(dense,diagonal)
+        complex(dp), intent(in) :: dense(:,:)
+        complex(dp), intent(inout) :: diagonal(:)
+        integer :: num_rows
+        integer :: i
+
+        num_rows = size(dense,dim=1)
+        do concurrent(i = 1:num_rows)
+            diagonal(i) = dense(i,i)
+        end do
+    end subroutine
+
     
     subroutine coo2dense_sp(COO,dense)
         integer, parameter :: wp = sp
@@ -186,6 +256,55 @@ contains
 
         do concurrent(idx = 1:COO%NNZ)
             dense( COO%index(1,idx) , COO%index(2,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+
+    subroutine coo2diagonal_sp(COO,diagonal)
+        integer, parameter :: wp = sp
+        type(COO_sp), intent(in) :: COO
+        real(sp), intent(inout) :: diagonal(:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            if(COO%index(1,idx)==COO%index(2,idx)) &
+            & diagonal( COO%index(1,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+    subroutine coo2diagonal_dp(COO,diagonal)
+        integer, parameter :: wp = dp
+        type(COO_dp), intent(in) :: COO
+        real(dp), intent(inout) :: diagonal(:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            if(COO%index(1,idx)==COO%index(2,idx)) &
+            & diagonal( COO%index(1,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+    subroutine coo2diagonal_csp(COO,diagonal)
+        integer, parameter :: wp = sp
+        type(COO_csp), intent(in) :: COO
+        complex(sp), intent(inout) :: diagonal(:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            if(COO%index(1,idx)==COO%index(2,idx)) &
+            & diagonal( COO%index(1,idx) ) = COO%data(idx)
+        end do
+    end subroutine
+
+    subroutine coo2diagonal_cdp(COO,diagonal)
+        integer, parameter :: wp = dp
+        type(COO_cdp), intent(in) :: COO
+        complex(dp), intent(inout) :: diagonal(:)
+        integer :: idx
+
+        do concurrent(idx = 1:COO%NNZ)
+            if(COO%index(1,idx)==COO%index(2,idx)) &
+            & diagonal( COO%index(1,idx) ) = COO%data(idx)
         end do
     end subroutine
 
@@ -456,6 +575,111 @@ contains
                 COO%index(1:2,j) = [i,CSR%col(j)]
             end do
         end do
+    end subroutine
+
+
+    subroutine csr2diagonal_sp(CSR,diagonal)
+        integer, parameter :: wp = sp
+        type(CSR_sp), intent(in) :: CSR
+        real(sp), intent(inout) :: diagonal(:)
+        integer :: i, j
+        select case(CSR%sym)
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i+1)-1 )
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i) )
+            end do
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                    if( CSR%col(j) == i ) then
+                        diagonal(i) = CSR%data(j)
+                        exit
+                    end if
+                end do
+            end do
+        end select
+    end subroutine
+
+    subroutine csr2diagonal_dp(CSR,diagonal)
+        integer, parameter :: wp = dp
+        type(CSR_dp), intent(in) :: CSR
+        real(dp), intent(inout) :: diagonal(:)
+        integer :: i, j
+        select case(CSR%sym)
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i+1)-1 )
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i) )
+            end do
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                    if( CSR%col(j) == i ) then
+                        diagonal(i) = CSR%data(j)
+                        exit
+                    end if
+                end do
+            end do
+        end select
+    end subroutine
+
+    subroutine csr2diagonal_csp(CSR,diagonal)
+        integer, parameter :: wp = sp
+        type(CSR_csp), intent(in) :: CSR
+        complex(sp), intent(inout) :: diagonal(:)
+        integer :: i, j
+        select case(CSR%sym)
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i+1)-1 )
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i) )
+            end do
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                    if( CSR%col(j) == i ) then
+                        diagonal(i) = CSR%data(j)
+                        exit
+                    end if
+                end do
+            end do
+        end select
+    end subroutine
+
+    subroutine csr2diagonal_cdp(CSR,diagonal)
+        integer, parameter :: wp = dp
+        type(CSR_cdp), intent(in) :: CSR
+        complex(dp), intent(inout) :: diagonal(:)
+        integer :: i, j
+        select case(CSR%sym)
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i+1)-1 )
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                diagonal(i) = CSR%data( CSR%rowptr(i) )
+            end do
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                    if( CSR%col(j) == i ) then
+                        diagonal(i) = CSR%data(j)
+                        exit
+                    end if
+                end do
+            end do
+        end select
     end subroutine
 
     
