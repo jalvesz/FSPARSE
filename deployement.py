@@ -34,7 +34,7 @@ def pre_process_toml(kargs):
 
     preprocess = table()
     preprocess.add("cpp", {} )
-    preprocess['cpp'].add("suffixes", [".f90", ".fypp"] )
+    preprocess['cpp'].add("suffixes", [".f90"] )
     # preprocess['cpp'].add("macros", [] )
     data.add("preprocess", preprocess)
 
