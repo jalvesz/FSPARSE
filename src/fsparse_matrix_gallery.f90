@@ -26,6 +26,34 @@ module fsparse_matrix_gallery
       integer :: base  = 1 !! index base = 0 for (C) or 1 (Fortran)
     end type
 
+    !! Dense: Dense matrix handler
+    type, public, extends(sparse_t) :: dense_sp
+        real(sp), pointer :: data(:,:) => null()
+    end type
+    type, public, extends(sparse_t) :: dense_dp
+        real(dp), pointer :: data(:,:) => null()
+    end type
+    type, public, extends(sparse_t) :: dense_csp
+        complex(sp), pointer :: data(:,:) => null()
+    end type
+    type, public, extends(sparse_t) :: dense_cdp
+        complex(dp), pointer :: data(:,:) => null()
+    end type
+
+    !! Diagonal: diagonal matrix handler
+    type, public, extends(sparse_t) :: diagonal_sp
+        real(sp), pointer :: data(:) => null()
+    end type
+    type, public, extends(sparse_t) :: diagonal_dp
+        real(dp), pointer :: data(:) => null()
+    end type
+    type, public, extends(sparse_t) :: diagonal_csp
+        complex(sp), pointer :: data(:) => null()
+    end type
+    type, public, extends(sparse_t) :: diagonal_cdp
+        complex(dp), pointer :: data(:) => null()
+    end type
+
     !! COO: COOrdinates compresed format
     type, public, extends(sparse_t) :: COO_t
       logical               :: isOrdered = .false. !! wether the matrix is ordered or not
@@ -72,24 +100,28 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_csr_sp
         procedure :: set => set_value_csr_sp
+        procedure :: set_block => set_block_matrix_csr_sp
     end type
     type, public, extends(CSR_t) :: CSR_dp
         real(dp), allocatable :: data(:) 
     contains
         procedure :: get => get_value_csr_dp
         procedure :: set => set_value_csr_dp
+        procedure :: set_block => set_block_matrix_csr_dp
     end type
     type, public, extends(CSR_t) :: CSR_csp
         complex(sp), allocatable :: data(:) 
     contains
         procedure :: get => get_value_csr_csp
         procedure :: set => set_value_csr_csp
+        procedure :: set_block => set_block_matrix_csr_csp
     end type
     type, public, extends(CSR_t) :: CSR_cdp
         complex(dp), allocatable :: data(:) 
     contains
         procedure :: get => get_value_csr_cdp
         procedure :: set => set_value_csr_cdp
+        procedure :: set_block => set_block_matrix_csr_cdp
     end type
 
     !! CSC: Compressed sparse column
@@ -580,6 +612,14 @@ contains
         end do
     end subroutine
 
+    subroutine set_block_matrix_csr_sp(self,num_dof,adr_dof,block_matrix)
+        class(CSR_sp), intent(inout) :: self
+        integer, intent(in)  :: num_dof
+        integer, intent(in)  :: adr_dof(num_dof)
+        real(sp), intent(in) :: block_matrix(num_dof,num_dof)
+        include 'includes/set_block_matrix_csr.inc'
+    end subroutine
+
     pure subroutine get_value_csr_dp(self,val,ik,jk)
         class(CSR_dp), intent(in) :: self
         real(dp), intent(out) :: val
@@ -607,6 +647,14 @@ contains
                 return
             end if
         end do
+    end subroutine
+
+    subroutine set_block_matrix_csr_dp(self,num_dof,adr_dof,block_matrix)
+        class(CSR_dp), intent(inout) :: self
+        integer, intent(in)  :: num_dof
+        integer, intent(in)  :: adr_dof(num_dof)
+        real(dp), intent(in) :: block_matrix(num_dof,num_dof)
+        include 'includes/set_block_matrix_csr.inc'
     end subroutine
 
     pure subroutine get_value_csr_csp(self,val,ik,jk)
@@ -638,6 +686,14 @@ contains
         end do
     end subroutine
 
+    subroutine set_block_matrix_csr_csp(self,num_dof,adr_dof,block_matrix)
+        class(CSR_csp), intent(inout) :: self
+        integer, intent(in)  :: num_dof
+        integer, intent(in)  :: adr_dof(num_dof)
+        complex(sp), intent(in) :: block_matrix(num_dof,num_dof)
+        include 'includes/set_block_matrix_csr.inc'
+    end subroutine
+
     pure subroutine get_value_csr_cdp(self,val,ik,jk)
         class(CSR_cdp), intent(in) :: self
         complex(dp), intent(out) :: val
@@ -665,6 +721,14 @@ contains
                 return
             end if
         end do
+    end subroutine
+
+    subroutine set_block_matrix_csr_cdp(self,num_dof,adr_dof,block_matrix)
+        class(CSR_cdp), intent(inout) :: self
+        integer, intent(in)  :: num_dof
+        integer, intent(in)  :: adr_dof(num_dof)
+        complex(dp), intent(in) :: block_matrix(num_dof,num_dof)
+        include 'includes/set_block_matrix_csr.inc'
     end subroutine
 
 
