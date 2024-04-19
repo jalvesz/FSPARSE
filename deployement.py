@@ -53,7 +53,7 @@ def pre_process_fypp(kargs):
     if kargs.with_qp:
         kwd.append("-DWITH_QP=True")
     if kargs.with_xqp:
-        kwd.append("-DWITH_XQP=True")
+        kwd.append("-DWITH_XDP=True")
     
     optparser = fypp.get_option_parser()
     options, leftover = optparser.parse_args(args=kwd)
