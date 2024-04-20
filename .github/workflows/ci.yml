@@ -22,9 +22,9 @@ jobs:
           - os: windows-latest
             toolchain: {compiler: gcc, version: 13, flags: ['-cpp -O3 -march=native -mtune=native']}
           - os: windows-latest
-            toolchain: {compiler: intel-classic, version: '2021.10', flags: ['-fpp -O3']}
+            toolchain: {compiler: intel-classic, version: '2021.10', flags: ["/fpp /O3"]}
           - os: windows-latest
-            toolchain: {compiler: intel, version: '2024.1', flags: ['-fpp -O3']}
+            toolchain: {compiler: intel, version: '2024.1', flags: ["/fpp /O3"]}
           - os: macos-latest
             toolchain: {compiler: gcc, version: 13, flags: ['-cpp -O3 -march=native -mtune=native']}
           - os: macos-latest
