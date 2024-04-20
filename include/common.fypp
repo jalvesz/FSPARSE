@@ -63,6 +63,8 @@
 #! Collected (kind, type) tuples for integer types
 #:set INT_KINDS_TYPES = list(zip(INT_KINDS, INT_TYPES))
 
+#! Sparse types to be considered during templating
+#:set SPARSE_TYPES = ["COO", "CSR", "CSC", "ELL","dense","diagonal"]
 
 #! Generates an array rank suffix.
 #!
