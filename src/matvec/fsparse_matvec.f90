@@ -301,15 +301,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(i) = vec_y(i) + data(j) * vec_x(col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -346,15 +342,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(:,i) = vec_y(:,i) + data(j) * vec_x(:,col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -391,15 +383,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(i) = vec_y(i) + data(j) * vec_x(col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -436,15 +424,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(:,i) = vec_y(:,i) + data(j) * vec_x(:,col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -481,15 +465,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(i) = vec_y(i) + data(j) * vec_x(col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -526,15 +506,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(:,i) = vec_y(:,i) + data(j) * vec_x(:,col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -571,15 +547,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(i) = vec_y(i) + data(j) * vec_x(col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
@@ -616,15 +588,11 @@ contains
         associate( data => matrix%data, col => matrix%col, rowptr => matrix%rowptr, &
             & nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym )
             if( sym == k_NOSYMMETRY) then
-                !$omp parallel shared(matrix,vec_x,vec_y)
-                !$omp do schedule(static) reduction(+:vec_y)
                 do i = 1, nrows
                     do j = rowptr(i), rowptr(i+1)-1
                         vec_y(:,i) = vec_y(:,i) + data(j) * vec_x(:,col(j))
                     end do
                 end do
-                !$omp end do
-                !$omp end parallel
                 
             else if( sym == k_SYMTRIINF )then
                 do i = 1 , nrows
