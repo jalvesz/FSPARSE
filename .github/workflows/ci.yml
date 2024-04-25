@@ -34,7 +34,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
       
-      - uses: wpbonelli/setup-fortran@848728b9f8f277e196a7e4e1afb61474c4869d2e
+      - uses: fortran-lang/setup-fortran@main
         id: setup-fortran
         with:
           compiler: ${{ matrix.toolchain.compiler }}
