@@ -190,6 +190,27 @@ module fsparse_matrix_gallery
         procedure :: set => set_value_ell_cdp
     end type
 
+    !! Compressed SELL-C 
+    !! Reference : https://library.eecs.utk.edu/storage/files/ut-eecs-14-727.pdf
+    type, public, extends(sparse_t) :: SELLC_t
+      integer               :: chunk_size = 8 !! default chunk size
+      integer, allocatable  :: rowptr(:) !! row pointer
+      integer, allocatable  :: col(:,:)  !! column indices
+    end type
+  
+    type, public, extends(SELLC_t) :: SELLC_sp
+        real(sp), allocatable :: data(:,:) 
+    end type
+    type, public, extends(SELLC_t) :: SELLC_dp
+        real(dp), allocatable :: data(:,:) 
+    end type
+    type, public, extends(SELLC_t) :: SELLC_csp
+        complex(sp), allocatable :: data(:,:) 
+    end type
+    type, public, extends(SELLC_t) :: SELLC_cdp
+        complex(dp), allocatable :: data(:,:) 
+    end type
+
 contains
 
     subroutine malloc_coo(self,num_rows,num_cols,nnz)

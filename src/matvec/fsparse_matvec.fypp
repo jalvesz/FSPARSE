@@ -26,8 +26,8 @@ module fsparse_matvec
         module procedure matvec_ell_${rank}$d_${s1}$
         module procedure matvec_dense_${rank}$d_${s1}$
         module procedure matvec_diagonal_${rank}$d_${s1}$
-
         #:endfor
+        module procedure matvec_sellc_${s1}$
         #:endfor
     end interface
 
@@ -194,6 +194,77 @@ contains
     end subroutine
     
     #:endfor
+    #:endfor
+
+    !! matvec_sellc
+    #:set CHUNKS = [4,8,16]
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine matvec_sellc_${s1}$(matrix,vec_x,vec_y)
+        !! This algorithm was gracefully provided by Ivan Privec and adapted by Jose Alves
+        type(SELLC_${s1}$), intent(in) :: matrix
+        ${t1}$, intent(in)    :: vec_x(:)
+        ${t1}$, intent(inout) :: vec_y(:)
+        ${t1}$, parameter     :: zero = zero_${s1}$
+        integer :: i, nz, rowidx, num_chunks, rm
+
+        associate( data => matrix%data, ia => matrix%rowptr , ja => matrix%col, cs => matrix%chunk_size, &
+        &   nnz => matrix%nnz, nrows => matrix%nrows, ncols => matrix%ncols, sym => matrix%sym  )
+        num_chunks = nrows / cs
+        rm = nrows - num_chunks * cs
+        if( sym == k_NOSYMMETRY) then
+
+            select case(cs)
+            #:for chunk in CHUNKS
+            case(${chunk}$)
+                do i = 1, num_chunks
+                    nz = ia(i+1) - ia(i)
+                    rowidx = (i - 1)*${chunk}$ + 1 
+                    call chunk_kernel_${chunk}$(nz,data(:,ia(i)),ja(:,ia(i)),vec_x,vec_y(rowidx:))
+                end do
+            #:endfor
+            case default
+                print *, "error: chunk size not supported."
+                return
+            end select
+            
+            ! remainder
+            if(rm>0)then 
+                i = num_chunks + 1 
+                nz = ia(i+1) - ia(i)
+                rowidx = (i - 1)*cs + 1
+                call chunk_kernel_remainder(nz,cs,rm,data(:,ia(i)),ja(:,ia(i)),vec_x,vec_y(rowidx:))
+            end if
+
+        end if
+        end associate
+
+    contains
+    #:for chunk in CHUNKS
+    pure subroutine chunk_kernel_${chunk}$(nz,a,ja,x,y)
+        integer, value      :: nz
+        ${t1}$, intent(in)  :: a(${chunk}$,nz), x(*)
+        integer, intent(in) :: ja(${chunk}$,nz)
+        ${t1}$, intent(out) :: y(${chunk}$)
+        integer :: j
+        do j = 1, nz
+            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+        end do
+    end subroutine
+    #:endfor
+
+    pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
+        integer, value      :: nz, cs, rm
+        ${t1}$, intent(in)  :: a(cs,nz), x(*)
+        integer, intent(in) :: ja(cs,nz)
+        ${t1}$, intent(out) :: y(rm)
+        integer :: j
+        do j = 1, nz
+            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+        end do
+    end subroutine  
+
+    end subroutine
+    
     #:endfor
 
     !! matvec_dense

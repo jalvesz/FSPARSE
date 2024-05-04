@@ -60,6 +60,13 @@ module fsparse_conversions
         module procedure csr2diagonal_cdp
     end interface
 
+    interface csr2sellc
+        module procedure csr2sellc_sp
+        module procedure csr2sellc_dp
+        module procedure csr2sellc_csp
+        module procedure csr2sellc_cdp
+    end interface
+
 contains
     subroutine dense2coo_sp(dense,COO)
         integer, parameter :: wp = sp
@@ -575,6 +582,259 @@ contains
                 COO%index(1:2,j) = [i,CSR%col(j)]
             end do
         end do
+    end subroutine
+
+
+    subroutine csr2sellc_sp(CSR,SELLC,chunk)
+        !! csr2sellc: This function enables transfering data from a CSR matrix to a SELL-C matrix
+        !! This algorithm was gracefully provided by Ivan Privec and adapted by Jose Alves
+        type(CSR_sp), intent(in)      :: CSR
+        type(SELLC_sp), intent(inout) :: SELLC
+        integer, intent(in), optional :: chunk
+        real(sp), parameter :: zero = zero_sp
+        integer :: i, j, num_chunks
+
+        if(present(chunk)) SELLC%chunk_size = chunk
+
+        SELLC%nrows = CSR%nrows; SELLC%ncols = CSR%ncols
+        SELLC%base  = CSR%base;  SELLC%sym = CSR%sym
+        associate( nrows=>SELLC%nrows, ncols=>SELLC%ncols, nnz=>SELLC%nnz, &
+        &         chunk_size=>SELLC%chunk_size     )
+        !-------------------------------------------
+        ! csr rowptr to SELL-C chunked rowptr
+        num_chunks = (nrows + chunk_size - 1)/chunk_size
+        allocate( SELLC%rowptr(num_chunks+1) )
+        block
+            integer :: cidx, rownnz, chunknnz
+            SELLC%rowptr(1) = 1
+            cidx = 1
+            do i = 1, nrows, chunk_size
+                chunknnz = 0
+                ! Iterate over rows in a given chunk
+                do j = i, min(i+chunk_size-1,nrows)
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j)
+                    chunknnz = max(chunknnz,rownnz)
+                end do
+                SELLC%rowptr(cidx+1) = SELLC%rowptr(cidx) + chunknnz
+                cidx = cidx + 1
+            end do
+            nnz = SELLC%rowptr(num_chunks+1) - 1
+        end block
+        !-------------------------------------------
+        ! copy values and colum index
+        allocate(SELLC%col(chunk_size,nnz), source = -1)
+        allocate(SELLC%data(chunk_size,nnz), source = zero )
+        block
+            integer :: lb, ri, iaa, iab, rownnz
+            do i = 1, num_chunks
+
+                lb = SELLC%rowptr(i)
+
+                ! Loop over rows of a chunk
+                do j = (i-1)*chunk_size + 1, min(i*chunk_size,nrows)
+    
+                    ri = j - (i - 1)*chunk_size
+                    
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j) - 1
+                    iaa    = CSR%rowptr(j)
+                    iab    = CSR%rowptr(j+1) - 1
+                    
+                    SELLC%col(ri,lb:lb+rownnz)  = CSR%col(iaa:iab)
+                    SELLC%data(ri,lb:lb+rownnz) = CSR%data(iaa:iab)
+                
+                end do
+            end do
+         end block
+        end associate
+    end subroutine
+
+    subroutine csr2sellc_dp(CSR,SELLC,chunk)
+        !! csr2sellc: This function enables transfering data from a CSR matrix to a SELL-C matrix
+        !! This algorithm was gracefully provided by Ivan Privec and adapted by Jose Alves
+        type(CSR_dp), intent(in)      :: CSR
+        type(SELLC_dp), intent(inout) :: SELLC
+        integer, intent(in), optional :: chunk
+        real(dp), parameter :: zero = zero_dp
+        integer :: i, j, num_chunks
+
+        if(present(chunk)) SELLC%chunk_size = chunk
+
+        SELLC%nrows = CSR%nrows; SELLC%ncols = CSR%ncols
+        SELLC%base  = CSR%base;  SELLC%sym = CSR%sym
+        associate( nrows=>SELLC%nrows, ncols=>SELLC%ncols, nnz=>SELLC%nnz, &
+        &         chunk_size=>SELLC%chunk_size     )
+        !-------------------------------------------
+        ! csr rowptr to SELL-C chunked rowptr
+        num_chunks = (nrows + chunk_size - 1)/chunk_size
+        allocate( SELLC%rowptr(num_chunks+1) )
+        block
+            integer :: cidx, rownnz, chunknnz
+            SELLC%rowptr(1) = 1
+            cidx = 1
+            do i = 1, nrows, chunk_size
+                chunknnz = 0
+                ! Iterate over rows in a given chunk
+                do j = i, min(i+chunk_size-1,nrows)
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j)
+                    chunknnz = max(chunknnz,rownnz)
+                end do
+                SELLC%rowptr(cidx+1) = SELLC%rowptr(cidx) + chunknnz
+                cidx = cidx + 1
+            end do
+            nnz = SELLC%rowptr(num_chunks+1) - 1
+        end block
+        !-------------------------------------------
+        ! copy values and colum index
+        allocate(SELLC%col(chunk_size,nnz), source = -1)
+        allocate(SELLC%data(chunk_size,nnz), source = zero )
+        block
+            integer :: lb, ri, iaa, iab, rownnz
+            do i = 1, num_chunks
+
+                lb = SELLC%rowptr(i)
+
+                ! Loop over rows of a chunk
+                do j = (i-1)*chunk_size + 1, min(i*chunk_size,nrows)
+    
+                    ri = j - (i - 1)*chunk_size
+                    
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j) - 1
+                    iaa    = CSR%rowptr(j)
+                    iab    = CSR%rowptr(j+1) - 1
+                    
+                    SELLC%col(ri,lb:lb+rownnz)  = CSR%col(iaa:iab)
+                    SELLC%data(ri,lb:lb+rownnz) = CSR%data(iaa:iab)
+                
+                end do
+            end do
+         end block
+        end associate
+    end subroutine
+
+    subroutine csr2sellc_csp(CSR,SELLC,chunk)
+        !! csr2sellc: This function enables transfering data from a CSR matrix to a SELL-C matrix
+        !! This algorithm was gracefully provided by Ivan Privec and adapted by Jose Alves
+        type(CSR_csp), intent(in)      :: CSR
+        type(SELLC_csp), intent(inout) :: SELLC
+        integer, intent(in), optional :: chunk
+        complex(sp), parameter :: zero = zero_csp
+        integer :: i, j, num_chunks
+
+        if(present(chunk)) SELLC%chunk_size = chunk
+
+        SELLC%nrows = CSR%nrows; SELLC%ncols = CSR%ncols
+        SELLC%base  = CSR%base;  SELLC%sym = CSR%sym
+        associate( nrows=>SELLC%nrows, ncols=>SELLC%ncols, nnz=>SELLC%nnz, &
+        &         chunk_size=>SELLC%chunk_size     )
+        !-------------------------------------------
+        ! csr rowptr to SELL-C chunked rowptr
+        num_chunks = (nrows + chunk_size - 1)/chunk_size
+        allocate( SELLC%rowptr(num_chunks+1) )
+        block
+            integer :: cidx, rownnz, chunknnz
+            SELLC%rowptr(1) = 1
+            cidx = 1
+            do i = 1, nrows, chunk_size
+                chunknnz = 0
+                ! Iterate over rows in a given chunk
+                do j = i, min(i+chunk_size-1,nrows)
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j)
+                    chunknnz = max(chunknnz,rownnz)
+                end do
+                SELLC%rowptr(cidx+1) = SELLC%rowptr(cidx) + chunknnz
+                cidx = cidx + 1
+            end do
+            nnz = SELLC%rowptr(num_chunks+1) - 1
+        end block
+        !-------------------------------------------
+        ! copy values and colum index
+        allocate(SELLC%col(chunk_size,nnz), source = -1)
+        allocate(SELLC%data(chunk_size,nnz), source = zero )
+        block
+            integer :: lb, ri, iaa, iab, rownnz
+            do i = 1, num_chunks
+
+                lb = SELLC%rowptr(i)
+
+                ! Loop over rows of a chunk
+                do j = (i-1)*chunk_size + 1, min(i*chunk_size,nrows)
+    
+                    ri = j - (i - 1)*chunk_size
+                    
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j) - 1
+                    iaa    = CSR%rowptr(j)
+                    iab    = CSR%rowptr(j+1) - 1
+                    
+                    SELLC%col(ri,lb:lb+rownnz)  = CSR%col(iaa:iab)
+                    SELLC%data(ri,lb:lb+rownnz) = CSR%data(iaa:iab)
+                
+                end do
+            end do
+         end block
+        end associate
+    end subroutine
+
+    subroutine csr2sellc_cdp(CSR,SELLC,chunk)
+        !! csr2sellc: This function enables transfering data from a CSR matrix to a SELL-C matrix
+        !! This algorithm was gracefully provided by Ivan Privec and adapted by Jose Alves
+        type(CSR_cdp), intent(in)      :: CSR
+        type(SELLC_cdp), intent(inout) :: SELLC
+        integer, intent(in), optional :: chunk
+        complex(dp), parameter :: zero = zero_cdp
+        integer :: i, j, num_chunks
+
+        if(present(chunk)) SELLC%chunk_size = chunk
+
+        SELLC%nrows = CSR%nrows; SELLC%ncols = CSR%ncols
+        SELLC%base  = CSR%base;  SELLC%sym = CSR%sym
+        associate( nrows=>SELLC%nrows, ncols=>SELLC%ncols, nnz=>SELLC%nnz, &
+        &         chunk_size=>SELLC%chunk_size     )
+        !-------------------------------------------
+        ! csr rowptr to SELL-C chunked rowptr
+        num_chunks = (nrows + chunk_size - 1)/chunk_size
+        allocate( SELLC%rowptr(num_chunks+1) )
+        block
+            integer :: cidx, rownnz, chunknnz
+            SELLC%rowptr(1) = 1
+            cidx = 1
+            do i = 1, nrows, chunk_size
+                chunknnz = 0
+                ! Iterate over rows in a given chunk
+                do j = i, min(i+chunk_size-1,nrows)
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j)
+                    chunknnz = max(chunknnz,rownnz)
+                end do
+                SELLC%rowptr(cidx+1) = SELLC%rowptr(cidx) + chunknnz
+                cidx = cidx + 1
+            end do
+            nnz = SELLC%rowptr(num_chunks+1) - 1
+        end block
+        !-------------------------------------------
+        ! copy values and colum index
+        allocate(SELLC%col(chunk_size,nnz), source = -1)
+        allocate(SELLC%data(chunk_size,nnz), source = zero )
+        block
+            integer :: lb, ri, iaa, iab, rownnz
+            do i = 1, num_chunks
+
+                lb = SELLC%rowptr(i)
+
+                ! Loop over rows of a chunk
+                do j = (i-1)*chunk_size + 1, min(i*chunk_size,nrows)
+    
+                    ri = j - (i - 1)*chunk_size
+                    
+                    rownnz = CSR%rowptr(j+1) - CSR%rowptr(j) - 1
+                    iaa    = CSR%rowptr(j)
+                    iab    = CSR%rowptr(j+1) - 1
+                    
+                    SELLC%col(ri,lb:lb+rownnz)  = CSR%col(iaa:iab)
+                    SELLC%data(ri,lb:lb+rownnz) = CSR%data(iaa:iab)
+                
+                end do
+            end do
+         end block
+        end associate
     end subroutine
 
 

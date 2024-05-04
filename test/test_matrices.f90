@@ -22,6 +22,7 @@ module test_fsparse
             new_unittest('csr', test_csr), &
             new_unittest('csc', test_csc), &
             new_unittest('ell', test_ell),  &
+            new_unittest('sellc', test_sellc),  &
             new_unittest('symmetries', test_symmetries), &
             new_unittest('cells2sparse', test_cells2sparse) &
         ]
@@ -260,6 +261,69 @@ module test_fsparse
             if (allocated(error)) return
         end block
         
+    end subroutine
+
+    subroutine test_sellc(error)
+        !> Error handling
+        type(error_type), allocatable, intent(out) :: error
+        block
+            integer, parameter :: wp = sp
+            type(SELLC_sp) :: SELLC
+            type(CSR_sp)   :: CSR
+            real(sp), allocatable :: vec_x(:)
+            real(sp), allocatable :: vec_y(:)
+            integer :: i
+
+            call CSR%malloc(6,6,17)
+            !           1   2   3   4   5   6 
+            CSR%col = [ 1,      3,  4,         &
+                            2,  3,      5,  6, &
+                        1,  2,  3,             &
+                                        5,  6, &
+                                    4,  5,     &
+                            2,          5,  6]
+            CSR%rowptr = [1,4,8,11,13,15,18]
+            CSR%data = [(real(i,kind=wp),i=1,CSR%nnz)] 
+            
+            call csr2sellc(CSR,SELLC,4)
+
+            allocate( vec_x(6) , source = 1._wp )
+            allocate( vec_y(6) , source = 0._wp )
+            
+            call matvec( SELLC, vec_x, vec_y )
+            
+            call check(error, all(vec_y == real([6,22,27,23,27,48],kind=wp)) )
+            if (allocated(error)) return
+        end block
+        block
+            integer, parameter :: wp = dp
+            type(SELLC_dp) :: SELLC
+            type(CSR_dp)   :: CSR
+            real(dp), allocatable :: vec_x(:)
+            real(dp), allocatable :: vec_y(:)
+            integer :: i
+
+            call CSR%malloc(6,6,17)
+            !           1   2   3   4   5   6 
+            CSR%col = [ 1,      3,  4,         &
+                            2,  3,      5,  6, &
+                        1,  2,  3,             &
+                                        5,  6, &
+                                    4,  5,     &
+                            2,          5,  6]
+            CSR%rowptr = [1,4,8,11,13,15,18]
+            CSR%data = [(real(i,kind=wp),i=1,CSR%nnz)] 
+            
+            call csr2sellc(CSR,SELLC,4)
+
+            allocate( vec_x(6) , source = 1._wp )
+            allocate( vec_y(6) , source = 0._wp )
+            
+            call matvec( SELLC, vec_x, vec_y )
+            
+            call check(error, all(vec_y == real([6,22,27,23,27,48],kind=wp)) )
+            if (allocated(error)) return
+        end block
     end subroutine
 
     subroutine test_symmetries(error)

@@ -57,11 +57,12 @@ contains
         !---------------------------------------------------------
         ! Fill in COO sparse data
         if( selfloop_ ) then ! diagonal terms
-        COO%index(1,adr0+1:adr0+num_points) = [ (i, i = shift_+1, shift_+num_points) ]
-        COO%index(2,adr0+1:adr0+num_points) = COO%index(1,adr0+1:adr0+num_points)
+        do i = shift_+1, shift_+num_points
+            COO%index(1:2,adr0+i) = i
+        end do
         adr0 = adr0 + num_points
         end if
-            
+        
         select case( symtype_ ) ! off-diagonal terms
         case( k_NOSYMMETRY ) ! Full matrix
             do concurrent (cell = 1:num_cells_)
