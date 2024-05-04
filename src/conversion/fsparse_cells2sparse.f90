@@ -65,7 +65,7 @@ contains
         
         select case( symtype_ ) ! off-diagonal terms
         case( k_NOSYMMETRY ) ! Full matrix
-            do concurrent (cell = 1:num_cells_)
+            do cell = 1, num_cells_
                 adrg = adr0 + ned*(cell-1)
                 do i = 1, npc
                     do j = 1, i-1
@@ -79,7 +79,7 @@ contains
             end do
             
         case( k_SYMTRIINF ) ! Triangular inferior storage
-            do concurrent (cell = 1:num_cells_)
+            do cell = 1, num_cells_
                 adrg = adr0 + ned*(cell-1)
                 do i = 1, npc
                     do j = 1, i-1
@@ -92,7 +92,7 @@ contains
             end do
             
         case( k_SYMTRISUP ) ! Triangular superior storage
-            do concurrent (cell = 1:num_cells_)
+            do cell = 1, num_cells_
                 adrg = adr0 + ned*(cell-1)
                 do i = 1, npc
                     do j = 1, i-1
