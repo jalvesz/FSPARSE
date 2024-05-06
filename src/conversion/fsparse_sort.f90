@@ -466,10 +466,10 @@ module fsparse_sort
         class(COO_t), intent(inout) :: COO
         logical, intent(in), optional :: sort_data
         integer, allocatable :: itemp(:,:)
-
         logical :: sort_data_
         
         if(COO%isOrdered) return
+
         sort_data_ = .false.
         if(present(sort_data)) sort_data_ = sort_data
 
@@ -483,10 +483,8 @@ module fsparse_sort
                     call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
                 else 
-                    print *, COO%nnz, COO%nrows, COO%ncols
                     call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) )
-                    print *, COO%nnz, COO%nrows, COO%ncols
                 end if
                 call move_alloc( temp , COO%data )
                 end block
@@ -497,10 +495,8 @@ module fsparse_sort
                     call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
                 else 
-                    print *, COO%nnz, COO%nrows, COO%ncols
                     call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) )
-                    print *, COO%nnz, COO%nrows, COO%ncols
                 end if
                 call move_alloc( temp , COO%data )
                 end block
@@ -511,10 +507,8 @@ module fsparse_sort
                     call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
                 else 
-                    print *, COO%nnz, COO%nrows, COO%ncols
                     call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) )
-                    print *, COO%nnz, COO%nrows, COO%ncols
                 end if
                 call move_alloc( temp , COO%data )
                 end block
@@ -525,10 +519,8 @@ module fsparse_sort
                     call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
                 else 
-                    print *, COO%nnz, COO%nrows, COO%ncols
                     call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
                     allocate( temp(COO%nnz) )
-                    print *, COO%nnz, COO%nrows, COO%ncols
                 end if
                 call move_alloc( temp , COO%data )
                 end block
