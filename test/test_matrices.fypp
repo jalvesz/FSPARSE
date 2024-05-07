@@ -87,7 +87,7 @@ module test_fsparse
         COO%index(:,11) = [3,5]
         COO%index(:,12) = [4,5]
 
-        call coo2ordered(COO)
+        call coo2ordered(COO,sort_data=.true.)
         call check(error, COO%NNZ < 12 .and. COO%NNZ == 9 )
         if (allocated(error)) return
 
@@ -211,7 +211,7 @@ module test_fsparse
 
             allocate( vec_x(6) , source = 1._wp )
             allocate( vec_y(6) , source = 0._wp )
-            
+
             call matvec( SELLC, vec_x, vec_y )
             
             call check(error, all(vec_y == real([6,22,27,23,27,48],kind=wp)) )

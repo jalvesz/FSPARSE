@@ -1213,7 +1213,7 @@ contains
         real(sp), intent(out) :: y(rm)
         integer :: j
         do j = 1, nz
-            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+            where(ja(1:rm,j) > 0) y = y + a(1:rm,j) * x(ja(1:rm,j))               
         end do
     end subroutine  
 
@@ -1307,7 +1307,7 @@ contains
         real(dp), intent(out) :: y(rm)
         integer :: j
         do j = 1, nz
-            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+            where(ja(1:rm,j) > 0) y = y + a(1:rm,j) * x(ja(1:rm,j))               
         end do
     end subroutine  
 
@@ -1401,7 +1401,7 @@ contains
         complex(sp), intent(out) :: y(rm)
         integer :: j
         do j = 1, nz
-            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+            where(ja(1:rm,j) > 0) y = y + a(1:rm,j) * x(ja(1:rm,j))               
         end do
     end subroutine  
 
@@ -1495,7 +1495,7 @@ contains
         complex(dp), intent(out) :: y(rm)
         integer :: j
         do j = 1, nz
-            where(ja(:,j) > 0) y = y + a(:,j) * x(ja(:,j))               
+            where(ja(1:rm,j) > 0) y = y + a(1:rm,j) * x(ja(1:rm,j))               
         end do
     end subroutine  
 
