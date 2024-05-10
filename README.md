@@ -16,6 +16,7 @@ Available Matrices
 | CSR | `CSR_t` | `CSR_?p` | `CSR_c?p` |
 | CSC | `CSC_t` | `CSC_?p` | `CSC_c?p` |
 | ELL | `ELL_t` | `ELL_?p` | `ELL_c?p` |
+| SELL-C | `SELLC_t` | `SELLC_?p` | `SELLC_c?p` |
 
 COO: COordinate Sparse format
 
@@ -24,6 +25,8 @@ CSR: Compressed Sparse Row format
 CSC: Compressed Sparse Column format
 
 ELL: ELLPACK
+
+SELL-C: sliced ELLPACK format
 
 (Where `?` stands for the precision s,d,q)
 
@@ -34,25 +37,29 @@ Conversion subroutines follow the naming pattern _sourcetype2targettype_m ex:
 ```fortran
 call dense2coo( dense , coo )
 ```
-| Matrix | dense | COO   | CSR   | CSC   | ELL   |
-|--------|-------|-------|-------|-------|-------|
-| dense  |       | ✅    |       |       |       |
-| COO    | ✅    |       | ✅   |       |       |
-| CSR    |       | ✅    |       |       |       |
-| CSC    |       |       |       |       |       |
-| ELL    |       |       |       |       |       |
+| Matrix | dense | COO   | CSR   |
+|--------|-------|-------|-------|
+| dense  |       | ✅    |       |
+| COO    | ✅    |       | ✅   | 
+| CSR    |       | ✅    |       |
+| CSC    |       |       |       |
+| ELL    |       |       |       |
+| SELL-C |       |       | ✅    |
 
 ### Sparse Matrix-Vector product
-(availbale) Matrix vector products are interfaced by the procedure
+(available) Matrix vector products are interfaced by the procedure
 ```fortran
 call matvec( Mat , vec_x, vec_y ) ! vec_y = Mat * vec_x
 ```
+**NOTE**: The matvec in this lib do not initialize `vec_y=0`. Why? enable easy recycling of data to do `vec_y=vec_y+Mat*vec_x`. If a clean vector is needed make sure to put a `vec_y=0` just before calling matvec.
+
 | Matrix | full | symmetric |
 |--------|-------|------------------|
 | COO    | ✅ | ✅ |
 | CSR    | ✅ | ✅ |
-| CSC    | ✅ | ❌ |
+| CSC    | ✅ | (?) |
 | ELL    | ✅ | ❌ |
+| SELL-C | ✅ | ❌ |
 
 A taste of FSPARSE
 ==================
@@ -123,11 +130,15 @@ Inspiration & References
 
 [Calcul Scientifique Parallèle](https://www.dunod.com/sciences-techniques/calcul-scientifique-parallele-cours-exemples-avec-openmp-et-mpi-exercices-0)
 
+[Implementing a Sparse Matrix Vector Product for the SELL-C/SELL-C-σ formats on NVIDIA GPUs](https://library.eecs.utk.edu/storage/files/ut-eecs-14-727.pdf)
+
 Authors and contributors  
 ========================
 
 +   [José R. Alves Z.](https://www.researchgate.net/profile/Jose-Alves-25)  
     +   Mechanical Engineer, Researcher, Scientific Software Developer
++   [Samuele Giuli](https://github.com/SamueleGiuli)
++   [Ivan Privec](https://github.com/ivan-pi)
 
 Acknowledgement
 ===============

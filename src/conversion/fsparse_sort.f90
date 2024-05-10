@@ -207,7 +207,9 @@ module fsparse_sort
         end do
         !---------------------------------------------------------
         ! Remove duplicates
-        forall(ed=1:n) a(1:2,ed) = [rows_(ed),cols_(ed)]
+        do ed = 1,n
+            a(1:2,ed) = [rows_(ed),cols_(ed)]
+        end do
         stride = 0
         do ed = 2, n
             if( a(1,ed) == a(1,ed-1) .and. a(2,ed) == a(2,ed-1) ) then
@@ -460,45 +462,66 @@ module fsparse_sort
     end subroutine
 
 
-    subroutine coo2ordered(COO)
+    subroutine coo2ordered(COO,sort_data)
         class(COO_t), intent(inout) :: COO
+        logical, intent(in), optional :: sort_data
         integer, allocatable :: itemp(:,:)
+        logical :: sort_data_
         
         if(COO%isOrdered) return
-        
+
+        sort_data_ = .false.
+        if(present(sort_data)) sort_data_ = sort_data
+
         select type (coo)
             type is( coo_t )
                 call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
             type is( coo_sp )
                 block
                 real(sp), allocatable :: temp(:)
-                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
-                
-                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                if( sort_data_ ) then
+                    call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                else 
+                    call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) )
+                end if
                 call move_alloc( temp , COO%data )
                 end block
             type is( coo_dp )
                 block
                 real(dp), allocatable :: temp(:)
-                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
-                
-                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                if( sort_data_ ) then
+                    call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                else 
+                    call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) )
+                end if
                 call move_alloc( temp , COO%data )
                 end block
             type is( coo_csp )
                 block
                 complex(sp), allocatable :: temp(:)
-                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
-                
-                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                if( sort_data_ ) then
+                    call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                else 
+                    call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) )
+                end if
                 call move_alloc( temp , COO%data )
                 end block
             type is( coo_cdp )
                 block
                 complex(dp), allocatable :: temp(:)
-                call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
-                
-                allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                if( sort_data_ ) then
+                    call sort_coo(COO%index, COO%data, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) , source=COO%data(1:COO%nnz) )
+                else 
+                    call sort_coo(COO%index, COO%nnz, COO%nrows, COO%ncols)
+                    allocate( temp(COO%nnz) )
+                end if
                 call move_alloc( temp , COO%data )
                 end block
         end select

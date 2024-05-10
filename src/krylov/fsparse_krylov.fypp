@@ -1,0 +1,195 @@
+!>---------------------------------------------------
+!> Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
+!>
+!> Use of this source code is governed by a MIT
+!> license that can be found in the LICENSE.md file
+!>---------------------------------------------------
+#:include "common.fypp"
+#:set RANKS = range(1, 2+1)
+#:set KINDS_TYPES = REAL_KINDS_TYPES
+module fsparse_krylov
+    use fsparse_constants
+    use fsparse_matrix_gallery
+    use fsparse_matvec
+    use fsparse_conversions
+    implicit none
+    private
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    type, abstract, public :: abs_op_${s1}$
+    contains
+        procedure(abs_mop_${s1}$), deferred :: times !> matrix operator
+        procedure(abs_mop_${s1}$), deferred :: precd !> preconditionner
+        procedure(abs_dot_${s1}$), nopass, deferred :: inner !> dot_product
+    end type
+    #:endfor
+    
+    abstract interface
+        #:for k1, t1, s1 in (KINDS_TYPES)
+        subroutine abs_mop_${s1}$(op,x,y)
+            import :: ${k1}$, abs_op_${s1}$
+            class(abs_op_${s1}$) :: op
+            ${t1}$, intent(in)  :: x(:)
+            ${t1}$, intent(out) :: y(:)
+        end subroutine
+        ${t1}$ function abs_dot_${s1}$(x,y) result(r)
+            import :: ${k1}$
+            ${t1}$, intent(in) :: x(:)
+            ${t1}$, intent(in) :: y(:)
+        end function
+        #:endfor
+    end interface
+    
+    public :: cgsolve
+
+    interface cgsolve
+        #:for ST1 in (SPARSE_TYPES)
+        #:if ST1=="COO" or ST1=="CSR" or ST1=="dense"
+        #:for k1, t1, s1 in (KINDS_TYPES)
+        module subroutine cgsolve_${ST1}$_${s1}$(A,b,x,di,rtol,maxiter,restart)
+            #:if ST1 == "dense"
+            ${t1}$, intent(in), target :: A(:,:)
+            #:else 
+            type(${ST1}$_${s1}$), intent(in), target :: A
+            #:endif
+            ${t1}$, intent(in) :: b(:)
+            ${t1}$, intent(out) :: x(:)
+            logical, intent(in), optional, target :: di(:) !! Dirichlet conditions for blocked d.o.f
+            ${t1}$, intent(in), optional :: rtol
+            integer, intent(in), optional :: maxiter
+            logical, intent(in), optional :: restart !! Set X=0 or use it as starting solution
+        end subroutine
+        #:endfor
+        #:endif
+        #:endfor
+    end interface
+
+    public :: cgsolve_generic
+    interface cgsolve_generic
+        #:for k1, t1, s1 in (KINDS_TYPES)
+        module procedure :: cgsolve_generic_${s1}$
+        #:endfor
+    end interface
+
+    contains
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine cgsolve_generic_${s1}$(A,b,x,di,rtol,maxiter,restart)
+        class(abs_op_${s1}$), intent(in) :: A
+        ${t1}$, intent(in) :: b(:)
+        ${t1}$, intent(out) :: x(:)
+        logical, intent(in) :: di(:)
+        integer, intent(in) :: maxiter !! maximum number of iterations
+        ${t1}$, intent(in) :: rtol    !! relative tolerance
+        logical, intent(in) :: restart !! use values in x as initial solution
+
+        ${t1}$, parameter :: zero = zero_${s1}$
+        ${t1}$, parameter :: one  = 1._${k1}$
+        ${t1}$ :: norm_sq, norm_sq0, norm_sq_old, residual0
+        ${t1}$ :: zr1, zr2, zv2, alpha, beta, tolsq
+        ${t1}$, allocatable :: r(:), s(:), p(:), q(:)
+        integer :: iter
+        !--------------------------------------------
+        include 'fsparse_krylov_cgs.inc'
+    end subroutine
+    #:endfor
+
+end module
+
+!======================= submodules for standard types =====================
+#:for ST1 in (SPARSE_TYPES)
+#:if ST1=="COO" or ST1=="CSR" or ST1=="dense"
+submodule (fsparse_krylov) fsparse_krylov_${ST1}$
+    implicit none
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    type, extends(abs_op_${s1}$) :: linop_${s1}$
+        type(${ST1}$_${s1}$) :: ptr_${ST1}$_${s1}$
+        type(diagonal_${s1}$) :: ptr_pcd_${s1}$
+    contains
+        procedure :: times => loc_matvec_${s1}$
+        procedure :: precd => loc_precond_${s1}$
+        procedure, nopass :: inner => dot_${s1}$
+    end type
+
+    #:endfor
+    contains
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    subroutine loc_matvec_${s1}$(op,x,y)
+        class(linop_${s1}$) :: op
+        ${t1}$, intent(in)  :: x(:)
+        ${t1}$, intent(out) :: y(:)
+        y = zero_${s1}$
+        call matvec(op%ptr_${ST1}$_${s1}$,x,y)
+    end subroutine
+    subroutine loc_precond_${s1}$(op,x,y)
+        class(linop_${s1}$) :: op
+        ${t1}$, intent(in)  :: x(:)
+        ${t1}$, intent(out) :: y(:)
+        y = zero_${s1}$
+        call matvec(op%ptr_pcd_${s1}$,x,y)
+    end subroutine
+    ${t1}$ function dot_${s1}$(x,y) result(r)
+        ${t1}$, intent(in) :: x(:)
+        ${t1}$, intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+
+    #:endfor
+
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    module subroutine cgsolve_${ST1}$_${s1}$(A,b,x,di,rtol,maxiter,restart)
+        #:if ST1 == "dense"
+        ${t1}$, intent(in), target :: A(:,:)
+        #:else 
+        type(${ST1}$_${s1}$), intent(in), target :: A
+        #:endif
+        ${t1}$, intent(in) :: b(:) !! right hand side of the linear system
+        ${t1}$, intent(out) :: x(:) !! Solution vector, it can contain also the initial guess
+        logical, intent(in), optional, target :: di(:) !! Dirichlet conditions for blocked d.o.f
+        ${t1}$, intent(in), optional :: rtol !! relative tolerance
+        integer, intent(in), optional :: maxiter !! maximun number of iterations
+        logical, intent(in), optional :: restart !! Set X=0 or use it as starting solution
+
+        logical, pointer :: di_(:)
+        ${t1}$ :: rtol_
+        integer :: maxiter_
+        logical :: restart_
+        ${t1}$, allocatable, target :: diag(:)
+        !-------------------------
+        type(linop_${s1}$) :: op
+        !-------------------------
+        rtol_    = 1e-8_${k1}$
+        maxiter_ = 1000
+        restart_ = .true.
+        if(present(maxiter)) maxiter_ = maxiter
+        if(present(rtol))    rtol_    = rtol
+        if(present(restart)) restart_ = restart
+        if(present(di))then
+            di_ => di
+        else 
+            allocate(di_(size(x)),source=.false.)
+        end if
+        
+        !---------------- diagonal precond
+        allocate(diag,mold=x)
+        call ${ST1}$2diagonal(A,diag)
+        where(abs(diag)>0._${k1}$) diag = 1._${k1}$/diag
+        op%ptr_pcd_${s1}$%data => diag
+        !---------------- 
+        #:if ST1 == "dense"
+        op%ptr_${ST1}$_${s1}$%data => A(:,:)
+        #:else 
+        op%ptr_${ST1}$_${s1}$ = A
+        #:endif
+        
+        call cgsolve_generic(op,b,x,di_,rtol_,maxiter_,restart_)
+        if(.not.present(di)) deallocate(di_)
+
+    end subroutine
+
+    #:endfor
+
+end submodule
+#:endif
+#:endfor
+

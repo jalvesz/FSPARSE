@@ -1,0 +1,17 @@
+@gfortran-example-pccg
+options run --example 
+options --target example_pccg
+options --compiler gfortran
+options --flag "-cpp -O3 -march=native -mtune=native"
+
+@ifort-example-pccg
+options run --example 
+options --target example_pccg
+options --compiler ifort
+options --flag "-fpp -O3 -march=native"
+
+@nvfortran-example-pccg
+options run --example 
+options --target example_pccg
+options --compiler nvfortran
+options --flag "-Mpreprocess -fast -mp -Minfo"

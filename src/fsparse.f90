@@ -10,4 +10,5 @@ module fsparse
   use fsparse_matvec
   use fsparse_sort
   use fsparse_conversions
+  use fsparse_cells2sparse
 end module fsparse

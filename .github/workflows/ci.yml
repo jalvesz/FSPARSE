@@ -16,18 +16,18 @@ jobs:
           - os: ubuntu-latest
             toolchain: {compiler: intel-classic, version: '2021.10', flags: ['-fpp -O3 -xhost']}
           - os: ubuntu-latest
-            toolchain: {compiler: intel, version: '2024.0.1', flags: ['-fpp -O3 -xhost']}
+            toolchain: {compiler: intel, version: '2024.1', flags: ['-fpp -O3 -xhost']}
           - os: ubuntu-latest
             toolchain: {compiler: nvidia-hpc, version: '24.1', flags: ['-Mpreprocess -Ofast']}
           - os: windows-latest
             toolchain: {compiler: gcc, version: 13, flags: ['-cpp -O3 -march=native -mtune=native']}
           - os: windows-latest
-            toolchain: {compiler: intel-classic, version: '2021.10', flags: ['-fpp -O3 -QxHost']}
+            toolchain: {compiler: intel-classic, version: '2021.10', flags: ["/fpp /O3"]}
           - os: windows-latest
-            toolchain: {compiler: intel, version: '2024.0.1', flags: ['-fpp -O3 -QxHost']}
-          - os: macos-latest
+            toolchain: {compiler: intel, version: '2024.1', flags: ["/fpp /O3"]}
+          - os: macos-12
             toolchain: {compiler: gcc, version: 13, flags: ['-cpp -O3 -march=native -mtune=native']}
-          - os: macos-latest
+          - os: macos-12
             toolchain: {compiler: intel-classic, version: '2021.10', flags: ['-fpp -O3 -xhost']}
 
     steps:
@@ -44,13 +44,6 @@ jobs:
         uses: fortran-lang/setup-fpm@v5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Fortran on MacOS
-        if: contains( matrix.os, 'macos')
-        run: |
-          brew reinstall gcc@13
-          ln -s /usr/local/lib/gcc/13/libgfortran.5.dylib /usr/local/lib/
-          ln -s /usr/local/lib/gcc/13/libquadmath.0.dylib /usr/local/lib/
 
       - run: |
           fpm test --flag "${{ join(matrix.toolchain.flags, ' ') }}"

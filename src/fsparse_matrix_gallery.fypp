@@ -1,4 +1,4 @@
-#:include "include/common.fypp"
+#:include "common.fypp"
 #:set KINDS_TYPES = REAL_KINDS_TYPES + CMPLX_KINDS_TYPES
 !>---------------------------------------------------
 !> Copyright 2023-present Transvalor S.A. (José R. Alves Z.)
@@ -27,6 +27,20 @@ module fsparse_matrix_gallery
       integer :: sym   = k_NOSYMMETRY !! assumed storage symmetry
       integer :: base  = 1 !! index base = 0 for (C) or 1 (Fortran)
     end type
+
+    !! Dense: Dense matrix handler
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    type, public, extends(sparse_t) :: dense_${s1}$
+        ${t1}$, pointer :: data(:,:) => null()
+    end type
+    #:endfor
+
+    !! Diagonal: diagonal matrix handler
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    type, public, extends(sparse_t) :: diagonal_${s1}$
+        ${t1}$, pointer :: data(:) => null()
+    end type
+    #:endfor
 
     !! COO: COOrdinates compresed format
     type, public, extends(sparse_t) :: COO_t
@@ -59,6 +73,7 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_csr_${s1}$
         procedure :: set => set_value_csr_${s1}$
+        procedure :: set_block => set_block_matrix_csr_${s1}$
     end type
     #:endfor
 
@@ -93,6 +108,20 @@ module fsparse_matrix_gallery
     contains
         procedure :: get => get_value_ell_${s1}$
         procedure :: set => set_value_ell_${s1}$
+    end type
+    #:endfor
+
+    !! Compressed SELL-C 
+    !! Reference : https://library.eecs.utk.edu/storage/files/ut-eecs-14-727.pdf
+    type, public, extends(sparse_t) :: SELLC_t
+      integer               :: chunk_size = 8 !! default chunk size
+      integer, allocatable  :: rowptr(:) !! row pointer
+      integer, allocatable  :: col(:,:)  !! column indices
+    end type
+  
+    #:for k1, t1, s1 in (KINDS_TYPES)
+    type, public, extends(SELLC_t) :: SELLC_${s1}$
+        ${t1}$, allocatable :: data(:,:) 
     end type
     #:endfor
 
@@ -320,6 +349,14 @@ contains
                 return
             end if
         end do
+    end subroutine
+
+    subroutine set_block_matrix_csr_${s1}$(self,num_dof,adr_dof,block_matrix)
+        class(CSR_${s1}$), intent(inout) :: self
+        integer, intent(in)  :: num_dof
+        integer, intent(in)  :: adr_dof(num_dof)
+        ${t1}$, intent(in) :: block_matrix(num_dof,num_dof)
+        include 'includes/set_block_matrix_csr.inc'
     end subroutine
 
     #:endfor
