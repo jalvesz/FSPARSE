@@ -98,17 +98,23 @@ end module
 
 !======================= submodules for standard types =====================
 #:for ST1 in (SPARSE_TYPES)
-#:if ST1=="COO" or ST1=="CSR" or ST1=="dense"
+#:if ST1=="CSR" or ST1=="dense"
 submodule (fsparse_krylov) fsparse_krylov_${ST1}$
     implicit none
     #:for k1, t1, s1 in (KINDS_TYPES)
     type, extends(abs_op_${s1}$) :: linop_${s1}$
-        type(${ST1}$_${s1}$) :: ptr_${ST1}$_${s1}$
-        type(diagonal_${s1}$) :: ptr_pcd_${s1}$
+        #:if ST1 == "dense"
+        type(${ST1}$_${s1}$)  :: ptr_${ST1}$_${s1}$ ! pointer to the input original matrix
+        #:else 
+        type(${ST1}$_${s1}$), pointer :: ptr_${ST1}$_${s1}$ ! pointer to the input original matrix
+        #:endif
+        type(${ST1}$_${s1}$)  :: ptr_pco_${ST1}$_${s1}$ ! pointer/memory for out-of-diagonal preconditioner if any
+        type(diagonal_${s1}$) :: ptr_pcd_${s1}$    ! pointer/memory for diagonal preconditioner
     contains
         procedure :: times => loc_matvec_${s1}$
         procedure :: precd => loc_precond_${s1}$
         procedure, nopass :: inner => dot_${s1}$
+        procedure :: clear => clear_${s1}$
     end type
 
     #:endfor
@@ -121,6 +127,12 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         y = zero_${s1}$
         call matvec(op%ptr_${ST1}$_${s1}$,x,y)
     end subroutine
+    ${t1}$ function dot_${s1}$(x,y) result(r)
+        ${t1}$, intent(in) :: x(:)
+        ${t1}$, intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+    
     subroutine loc_precond_${s1}$(op,x,y)
         class(linop_${s1}$) :: op
         ${t1}$, intent(in)  :: x(:)
@@ -128,11 +140,27 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         y = zero_${s1}$
         call matvec(op%ptr_pcd_${s1}$,x,y)
     end subroutine
-    ${t1}$ function dot_${s1}$(x,y) result(r)
-        ${t1}$, intent(in) :: x(:)
-        ${t1}$, intent(in) :: y(:)
-        r = dot_product(x,y)
-    end function
+
+    subroutine factorization_jacobi_${s1}$(op)
+        class(linop_${s1}$) :: op
+        allocate(op%ptr_pcd_${s1}$%data(op%ptr_${ST1}$_${s1}$%nrows))
+        associate( diag => op%ptr_pcd_${s1}$%data , &
+            #:if ST1 == "dense"
+            &       mat => op%ptr_${ST1}$_${s1}$%data )
+            #:else 
+            &       mat => op%ptr_${ST1}$_${s1}$ )
+            #:endif
+
+            call ${ST1}$2diagonal(mat,diag)
+            where(abs(diag)>zero_${s1}$) diag = 1._${k1}$/diag
+
+        end associate
+    end subroutine
+
+    subroutine clear_${s1}$(op)
+        class(linop_${s1}$) :: op
+        deallocate(op%ptr_pcd_${s1}$%data)
+    end subroutine
 
     #:endfor
 
@@ -154,7 +182,6 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         ${t1}$ :: rtol_
         integer :: maxiter_
         logical :: restart_
-        ${t1}$, allocatable, target :: diag(:)
         !-------------------------
         type(linop_${s1}$) :: op
         !-------------------------
@@ -170,21 +197,26 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
             allocate(di_(size(x)),source=.false.)
         end if
         
-        !---------------- diagonal precond
-        allocate(diag,mold=x)
-        call ${ST1}$2diagonal(A,diag)
-        where(abs(diag)>0._${k1}$) diag = 1._${k1}$/diag
-        op%ptr_pcd_${s1}$%data => diag
-        !---------------- 
+        !-----------------------------------------------------
+        ! set matrix pointer
         #:if ST1 == "dense"
         op%ptr_${ST1}$_${s1}$%data => A(:,:)
         #:else 
-        op%ptr_${ST1}$_${s1}$ = A
+        op%ptr_${ST1}$_${s1}$ => A
         #:endif
-        
-        call cgsolve_generic(op,b,x,di_,rtol_,maxiter_,restart_)
-        if(.not.present(di)) deallocate(di_)
 
+        !-----------------------------------------------------
+        ! set preconditioner
+        call factorization_jacobi_${s1}$(op)
+
+        !-----------------------------------------------------
+        ! solve with pccg
+        call cgsolve_generic(op,b,x,di_,rtol_,maxiter_,restart_)
+
+        !-----------------------------------------------------
+        ! clean memory
+        if(.not.present(di)) deallocate(di_)
+        call op%clear
     end subroutine
 
     #:endfor
