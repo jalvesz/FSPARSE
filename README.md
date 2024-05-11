@@ -49,9 +49,8 @@ call dense2coo( dense , coo )
 ### Sparse Matrix-Vector product
 (available) Matrix vector products are interfaced by the procedure
 ```fortran
-call matvec( Mat , vec_x, vec_y ) ! vec_y = Mat * vec_x
+call matvec( Mat , vec_x, vec_y ) ! vec_y = vec_y + Mat * vec_x
 ```
-**NOTE**: The matvec in this lib do not initialize `vec_y=0`. Why? enable easy recycling of data to do `vec_y=vec_y+Mat*vec_x`. If a clean vector is needed make sure to put a `vec_y=0` just before calling matvec.
 
 | Matrix | full | symmetric |
 |--------|-------|------------------|
