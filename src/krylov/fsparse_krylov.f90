@@ -53,24 +53,6 @@ module fsparse_krylov
     public :: cgsolve
 
     interface cgsolve
-        module subroutine cgsolve_COO_sp(A,b,x,di,rtol,maxiter,restart)
-            type(COO_sp), intent(in), target :: A
-            real(sp), intent(in) :: b(:)
-            real(sp), intent(out) :: x(:)
-            logical, intent(in), optional, target :: di(:) !! Dirichlet conditions for blocked d.o.f
-            real(sp), intent(in), optional :: rtol
-            integer, intent(in), optional :: maxiter
-            logical, intent(in), optional :: restart !! Set X=0 or use it as starting solution
-        end subroutine
-        module subroutine cgsolve_COO_dp(A,b,x,di,rtol,maxiter,restart)
-            type(COO_dp), intent(in), target :: A
-            real(dp), intent(in) :: b(:)
-            real(dp), intent(out) :: x(:)
-            logical, intent(in), optional, target :: di(:) !! Dirichlet conditions for blocked d.o.f
-            real(dp), intent(in), optional :: rtol
-            integer, intent(in), optional :: maxiter
-            logical, intent(in), optional :: restart !! Set X=0 or use it as starting solution
-        end subroutine
         module subroutine cgsolve_CSR_sp(A,b,x,di,rtol,maxiter,restart)
             type(CSR_sp), intent(in), target :: A
             real(sp), intent(in) :: b(:)
@@ -189,6 +171,12 @@ submodule (fsparse_krylov) fsparse_krylov_CSR
         y = zero_sp
         call matvec(op%ptr_CSR_sp,x,y)
     end subroutine
+    real(sp) function dot_sp(x,y) result(r)
+        real(sp), intent(in) :: x(:)
+        real(sp), intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+
     subroutine loc_precond_sp(op,x,y)
         class(linop_sp) :: op
         real(sp), intent(in)  :: x(:)
@@ -196,11 +184,6 @@ submodule (fsparse_krylov) fsparse_krylov_CSR
         y = zero_sp
         call matvec(op%ptr_pcd_sp,x,y)
     end subroutine
-    real(sp) function dot_sp(x,y) result(r)
-        real(sp), intent(in) :: x(:)
-        real(sp), intent(in) :: y(:)
-        r = dot_product(x,y)
-    end function
 
     subroutine factorization_jacobi_sp(op)
         class(linop_sp) :: op
@@ -226,6 +209,12 @@ submodule (fsparse_krylov) fsparse_krylov_CSR
         y = zero_dp
         call matvec(op%ptr_CSR_dp,x,y)
     end subroutine
+    real(dp) function dot_dp(x,y) result(r)
+        real(dp), intent(in) :: x(:)
+        real(dp), intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+
     subroutine loc_precond_dp(op,x,y)
         class(linop_dp) :: op
         real(dp), intent(in)  :: x(:)
@@ -233,11 +222,6 @@ submodule (fsparse_krylov) fsparse_krylov_CSR
         y = zero_dp
         call matvec(op%ptr_pcd_dp,x,y)
     end subroutine
-    real(dp) function dot_dp(x,y) result(r)
-        real(dp), intent(in) :: x(:)
-        real(dp), intent(in) :: y(:)
-        r = dot_product(x,y)
-    end function
 
     subroutine factorization_jacobi_dp(op)
         class(linop_dp) :: op
@@ -383,6 +367,12 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         y = zero_sp
         call matvec(op%ptr_dense_sp,x,y)
     end subroutine
+    real(sp) function dot_sp(x,y) result(r)
+        real(sp), intent(in) :: x(:)
+        real(sp), intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+
     subroutine loc_precond_sp(op,x,y)
         class(linop_sp) :: op
         real(sp), intent(in)  :: x(:)
@@ -390,11 +380,6 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         y = zero_sp
         call matvec(op%ptr_pcd_sp,x,y)
     end subroutine
-    real(sp) function dot_sp(x,y) result(r)
-        real(sp), intent(in) :: x(:)
-        real(sp), intent(in) :: y(:)
-        r = dot_product(x,y)
-    end function
 
     subroutine factorization_jacobi_sp(op)
         class(linop_sp) :: op
@@ -420,6 +405,12 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         y = zero_dp
         call matvec(op%ptr_dense_dp,x,y)
     end subroutine
+    real(dp) function dot_dp(x,y) result(r)
+        real(dp), intent(in) :: x(:)
+        real(dp), intent(in) :: y(:)
+        r = dot_product(x,y)
+    end function
+
     subroutine loc_precond_dp(op,x,y)
         class(linop_dp) :: op
         real(dp), intent(in)  :: x(:)
@@ -427,11 +418,6 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         y = zero_dp
         call matvec(op%ptr_pcd_dp,x,y)
     end subroutine
-    real(dp) function dot_dp(x,y) result(r)
-        real(dp), intent(in) :: x(:)
-        real(dp), intent(in) :: y(:)
-        r = dot_product(x,y)
-    end function
 
     subroutine factorization_jacobi_dp(op)
         class(linop_dp) :: op
