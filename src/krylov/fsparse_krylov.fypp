@@ -201,6 +201,8 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         ! set matrix pointer
         #:if ST1 == "dense"
         op%ptr_${ST1}$_${s1}$%data => A(:,:)
+        op%ptr_${ST1}$_${s1}$%nrows = size(A,dim=1)
+        op%ptr_${ST1}$_${s1}$%ncols = size(A,dim=2)
         #:else 
         op%ptr_${ST1}$_${s1}$ => A
         #:endif

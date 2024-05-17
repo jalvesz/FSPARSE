@@ -468,6 +468,8 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         !-----------------------------------------------------
         ! set matrix pointer
         op%ptr_dense_sp%data => A(:,:)
+        op%ptr_dense_sp%nrows = size(A,dim=1)
+        op%ptr_dense_sp%ncols = size(A,dim=2)
 
         !-----------------------------------------------------
         ! set preconditioner
@@ -514,6 +516,8 @@ submodule (fsparse_krylov) fsparse_krylov_dense
         !-----------------------------------------------------
         ! set matrix pointer
         op%ptr_dense_dp%data => A(:,:)
+        op%ptr_dense_dp%nrows = size(A,dim=1)
+        op%ptr_dense_dp%ncols = size(A,dim=2)
 
         !-----------------------------------------------------
         ! set preconditioner
