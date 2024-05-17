@@ -28,7 +28,6 @@ module test_solvers
         real :: A(2,2) = reshape([4.0,1.0,1.0,3.0],shape=[2,2])
         real :: b(2) = [1.0,2.0]
         real :: x(2)
-        real :: tol = 0.0001
 
         call cgsolve(A,b,x)
         
