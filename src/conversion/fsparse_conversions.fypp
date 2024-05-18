@@ -10,6 +10,11 @@ module fsparse_conversions
     use fsparse_constants
     use fsparse_matrix_gallery
     implicit none
+    private
+    public :: dense2coo, dense2diagonal
+    public :: coo2dense, coo2diagonal
+    public :: coo2csr, csr2coo, csr2diagonal, csr2sellc
+    public :: csr_block_expansion
     
     interface dense2coo
     #:for k1, t1, s1 in (KINDS_TYPES)

@@ -7,6 +7,7 @@
 module test_fsparse
     use testdrive, only: new_unittest, unittest_type, error_type, check
     use fsparse
+    use fsparse_constants
     implicit none
     
     contains

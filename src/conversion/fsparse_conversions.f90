@@ -8,6 +8,11 @@ module fsparse_conversions
     use fsparse_constants
     use fsparse_matrix_gallery
     implicit none
+    private
+    public :: dense2coo, dense2diagonal
+    public :: coo2dense, coo2diagonal
+    public :: coo2csr, csr2coo, csr2diagonal, csr2sellc
+    public :: csr_block_expansion
     
     interface dense2coo
         module procedure dense2coo_sp
@@ -961,8 +966,7 @@ contains
 
         select case(CSR%sym)
         case(k_NOSYMMETRY)
-            block_nnz = num_dof ** 2
-            CSR%NNZ = CSR%NNZ * block_nnz
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
         case(k_SYMTRISUP,k_SYMTRIINF)
             block_nnz = num_dof + num_dof * (num_dof-1) / 2
             CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
@@ -976,7 +980,8 @@ contains
         case(k_NOSYMMETRY)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -991,7 +996,8 @@ contains
         case(k_SYMTRISUP)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1052,8 +1058,7 @@ contains
 
         select case(CSR%sym)
         case(k_NOSYMMETRY)
-            block_nnz = num_dof ** 2
-            CSR%NNZ = CSR%NNZ * block_nnz
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
         case(k_SYMTRISUP,k_SYMTRIINF)
             block_nnz = num_dof + num_dof * (num_dof-1) / 2
             CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
@@ -1067,7 +1072,8 @@ contains
         case(k_NOSYMMETRY)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1082,7 +1088,8 @@ contains
         case(k_SYMTRISUP)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1143,8 +1150,7 @@ contains
 
         select case(CSR%sym)
         case(k_NOSYMMETRY)
-            block_nnz = num_dof ** 2
-            CSR%NNZ = CSR%NNZ * block_nnz
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
         case(k_SYMTRISUP,k_SYMTRIINF)
             block_nnz = num_dof + num_dof * (num_dof-1) / 2
             CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
@@ -1158,7 +1164,8 @@ contains
         case(k_NOSYMMETRY)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1173,7 +1180,8 @@ contains
         case(k_SYMTRISUP)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1234,8 +1242,7 @@ contains
 
         select case(CSR%sym)
         case(k_NOSYMMETRY)
-            block_nnz = num_dof ** 2
-            CSR%NNZ = CSR%NNZ * block_nnz
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
         case(k_SYMTRISUP,k_SYMTRIINF)
             block_nnz = num_dof + num_dof * (num_dof-1) / 2
             CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
@@ -1249,7 +1256,8 @@ contains
         case(k_NOSYMMETRY)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
@@ -1264,7 +1272,8 @@ contains
         case(k_SYMTRISUP)
             do i = 1, CSR%nrows
                 do p = 1, num_dof
-                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
                 end do
                 do p = 1, num_dof
                     adr1 = rowptr_expn(num_dof*(i-1)+p)
