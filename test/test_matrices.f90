@@ -406,14 +406,36 @@ module test_fsparse
     subroutine test_cells2sparse(error)
         !> Error handling
         type(error_type), allocatable, intent(out) :: error
-        type(COO_dp) :: COO
-        integer :: cells(4,2)
+        type(COO_dp) :: COO, COO_n
+        type(CSR_dp) :: CSR, CSR_n1
+        real(8), allocatable :: dense(:,:), dense_n(:,:)
+        integer :: i, k, dof
+        integer, allocatable :: cells(:,:), cells_n(:,:)
 
+        allocate(cells(4,2))
         cells(1:4,1) = [2,5,3,4]
         cells(1:4,2) = [4,1,3,2]
-        call coo_from_cells(COO,cells,num_points=5,num_cells=2,selfloop=.true.,symtype=k_SYMTRISUP)
-        
+        call coo_from_cells(COO,cells,num_points=5,num_cells=2,selfloop=.true.,symtype=k_SYMTRIINF)
+        call coo2csr(COO,CSR)
+
         call check(error, size(COO%data) == 14 .and. size( COO%index , dim=2 ) == 14 )
+        if (allocated(error)) return
+
+        dof = 4
+        allocate(cells_n(4*dof,2))
+        do i =1 , 4
+            do k = 1, dof
+            cells_n(dof*(i-1)+k,1) = dof*(cells(i,1)-1)+k
+            cells_n(dof*(i-1)+k,2) = dof*(cells(i,2)-1)+k
+            end do
+        end do
+
+        call coo_from_cells(COO_n,cells_n,num_points=5*dof,num_cells=2,selfloop=.true.,symtype=k_SYMTRIINF)
+        call coo2csr(COO_n,CSR_n1)
+
+        call csr_block_expansion(CSR,dof)
+
+        call check(error, all(CSR%rowptr==CSR_n1%rowptr) .and. all(CSR%col==CSR_n1%col) )
         if (allocated(error)) return
 
     end subroutine

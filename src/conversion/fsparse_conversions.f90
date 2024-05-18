@@ -1015,17 +1015,17 @@ contains
                     & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
                 end do
                 do p = 1, num_dof
-                    adr1 = rowptr_expn(num_dof*(i-1)+p) - num_dof + 1
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
                     do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
                         adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                         do q = 1, num_dof
-                            col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                         end do
                     end do
                     j = CSR%rowptr(i+1)-1
                     adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                     do q = 1, p
-                        col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                     end do
                 end do
             end do
@@ -1106,17 +1106,17 @@ contains
                     & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
                 end do
                 do p = 1, num_dof
-                    adr1 = rowptr_expn(num_dof*(i-1)+p) - num_dof + 1
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
                     do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
                         adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                         do q = 1, num_dof
-                            col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                         end do
                     end do
                     j = CSR%rowptr(i+1)-1
                     adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                     do q = 1, p
-                        col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                     end do
                 end do
             end do
@@ -1197,17 +1197,17 @@ contains
                     & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
                 end do
                 do p = 1, num_dof
-                    adr1 = rowptr_expn(num_dof*(i-1)+p) - num_dof + 1
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
                     do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
                         adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                         do q = 1, num_dof
-                            col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                         end do
                     end do
                     j = CSR%rowptr(i+1)-1
                     adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                     do q = 1, p
-                        col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                     end do
                 end do
             end do
@@ -1288,17 +1288,17 @@ contains
                     & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
                 end do
                 do p = 1, num_dof
-                    adr1 = rowptr_expn(num_dof*(i-1)+p) - num_dof + 1
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
                     do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
                         adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                         do q = 1, num_dof
-                            col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                         end do
                     end do
                     j = CSR%rowptr(i+1)-1
                     adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
                     do q = 1, p
-                        col_expn(adr2+q) = num_dof*(CSR%col(j)-1)+q
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
                     end do
                 end do
             end do
