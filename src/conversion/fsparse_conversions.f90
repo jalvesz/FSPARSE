@@ -8,6 +8,11 @@ module fsparse_conversions
     use fsparse_constants
     use fsparse_matrix_gallery
     implicit none
+    private
+    public :: dense2coo, dense2diagonal
+    public :: coo2dense, coo2diagonal
+    public :: coo2csr, csr2coo, csr2diagonal, csr2sellc
+    public :: csr_block_expansion
     
     interface dense2coo
         module procedure dense2coo_sp
@@ -65,6 +70,13 @@ module fsparse_conversions
         module procedure csr2sellc_dp
         module procedure csr2sellc_csp
         module procedure csr2sellc_cdp
+    end interface
+
+    interface csr_block_expansion
+        module procedure csr_block_expansion_sp
+        module procedure csr_block_expansion_dp
+        module procedure csr_block_expansion_csp
+        module procedure csr_block_expansion_cdp
     end interface
 
 contains
@@ -940,6 +952,375 @@ contains
                 end do
             end do
         end select
+    end subroutine
+
+
+    subroutine csr_block_expansion_sp(CSR,num_dof)
+        !! This function enables expanding an ordered CSR matrix to include contigous blocks
+        !! Warning: this operation does not preserve the data buffer
+        type(CSR_sp), intent(inout) :: CSR
+        integer, intent(in) :: num_dof
+        real(sp), parameter :: zero = zero_sp
+        integer, allocatable :: rowptr_expn(:), col_expn(:)
+        integer :: i, j, p, q, adr1, adr2, block_nnz
+
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
+        case(k_SYMTRISUP,k_SYMTRIINF)
+            block_nnz = num_dof + num_dof * (num_dof-1) / 2
+            CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
+        end select
+
+        allocate( col_expn(CSR%NNZ) )
+        allocate( rowptr_expn(CSR%nrows*num_dof+1) )
+
+        rowptr_expn(1) = 1
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i))
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    j = CSR%rowptr(i)
+                    adr2 = adr1 - p + 1
+                    do q = p, num_dof
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                    do j = CSR%rowptr(i)+1, CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) - p + 1
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                    j = CSR%rowptr(i+1)-1
+                    adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                    do q = 1, p
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                end do
+            end do
+        end select
+
+        CSR%nrows = CSR%nrows * num_dof
+        CSR%ncols = CSR%ncols * num_dof
+
+        call move_alloc( rowptr_expn , CSR%rowptr )
+        call move_alloc( col_expn    , CSR%col    )
+
+        if( allocated(CSR%data) ) deallocate( CSR%data )
+        allocate( CSR%data(CSR%NNZ) , source = zero )
+    end subroutine
+
+    subroutine csr_block_expansion_dp(CSR,num_dof)
+        !! This function enables expanding an ordered CSR matrix to include contigous blocks
+        !! Warning: this operation does not preserve the data buffer
+        type(CSR_dp), intent(inout) :: CSR
+        integer, intent(in) :: num_dof
+        real(dp), parameter :: zero = zero_dp
+        integer, allocatable :: rowptr_expn(:), col_expn(:)
+        integer :: i, j, p, q, adr1, adr2, block_nnz
+
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
+        case(k_SYMTRISUP,k_SYMTRIINF)
+            block_nnz = num_dof + num_dof * (num_dof-1) / 2
+            CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
+        end select
+
+        allocate( col_expn(CSR%NNZ) )
+        allocate( rowptr_expn(CSR%nrows*num_dof+1) )
+
+        rowptr_expn(1) = 1
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i))
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    j = CSR%rowptr(i)
+                    adr2 = adr1 - p + 1
+                    do q = p, num_dof
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                    do j = CSR%rowptr(i)+1, CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) - p + 1
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                    j = CSR%rowptr(i+1)-1
+                    adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                    do q = 1, p
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                end do
+            end do
+        end select
+
+        CSR%nrows = CSR%nrows * num_dof
+        CSR%ncols = CSR%ncols * num_dof
+
+        call move_alloc( rowptr_expn , CSR%rowptr )
+        call move_alloc( col_expn    , CSR%col    )
+
+        if( allocated(CSR%data) ) deallocate( CSR%data )
+        allocate( CSR%data(CSR%NNZ) , source = zero )
+    end subroutine
+
+    subroutine csr_block_expansion_csp(CSR,num_dof)
+        !! This function enables expanding an ordered CSR matrix to include contigous blocks
+        !! Warning: this operation does not preserve the data buffer
+        type(CSR_csp), intent(inout) :: CSR
+        integer, intent(in) :: num_dof
+        complex(sp), parameter :: zero = zero_csp
+        integer, allocatable :: rowptr_expn(:), col_expn(:)
+        integer :: i, j, p, q, adr1, adr2, block_nnz
+
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
+        case(k_SYMTRISUP,k_SYMTRIINF)
+            block_nnz = num_dof + num_dof * (num_dof-1) / 2
+            CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
+        end select
+
+        allocate( col_expn(CSR%NNZ) )
+        allocate( rowptr_expn(CSR%nrows*num_dof+1) )
+
+        rowptr_expn(1) = 1
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i))
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    j = CSR%rowptr(i)
+                    adr2 = adr1 - p + 1
+                    do q = p, num_dof
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                    do j = CSR%rowptr(i)+1, CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) - p + 1
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                    j = CSR%rowptr(i+1)-1
+                    adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                    do q = 1, p
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                end do
+            end do
+        end select
+
+        CSR%nrows = CSR%nrows * num_dof
+        CSR%ncols = CSR%ncols * num_dof
+
+        call move_alloc( rowptr_expn , CSR%rowptr )
+        call move_alloc( col_expn    , CSR%col    )
+
+        if( allocated(CSR%data) ) deallocate( CSR%data )
+        allocate( CSR%data(CSR%NNZ) , source = zero )
+    end subroutine
+
+    subroutine csr_block_expansion_cdp(CSR,num_dof)
+        !! This function enables expanding an ordered CSR matrix to include contigous blocks
+        !! Warning: this operation does not preserve the data buffer
+        type(CSR_cdp), intent(inout) :: CSR
+        integer, intent(in) :: num_dof
+        complex(dp), parameter :: zero = zero_cdp
+        integer, allocatable :: rowptr_expn(:), col_expn(:)
+        integer :: i, j, p, q, adr1, adr2, block_nnz
+
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            CSR%NNZ = CSR%NNZ * num_dof ** 2
+        case(k_SYMTRISUP,k_SYMTRIINF)
+            block_nnz = num_dof + num_dof * (num_dof-1) / 2
+            CSR%NNZ = CSR%nrows * block_nnz + (CSR%NNZ-CSR%nrows) * num_dof ** 2
+        end select
+
+        allocate( col_expn(CSR%NNZ) )
+        allocate( rowptr_expn(CSR%nrows*num_dof+1) )
+
+        rowptr_expn(1) = 1
+        select case(CSR%sym)
+        case(k_NOSYMMETRY)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i))
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i))
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRISUP)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - p + 1
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    j = CSR%rowptr(i)
+                    adr2 = adr1 - p + 1
+                    do q = p, num_dof
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                    do j = CSR%rowptr(i)+1, CSR%rowptr(i+1)-1
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) - p + 1
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                end do
+            end do
+        case(k_SYMTRIINF)
+            do i = 1, CSR%nrows
+                do p = 1, num_dof
+                    rowptr_expn(num_dof*(i-1)+p+1) = rowptr_expn(num_dof*(i-1)+p) &
+                    & + num_dof*(CSR%rowptr(i+1)-CSR%rowptr(i)) - num_dof + p
+                end do
+                do p = 1, num_dof
+                    adr1 = rowptr_expn(num_dof*(i-1)+p)
+                    do j = CSR%rowptr(i), CSR%rowptr(i+1)-2
+                        adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                        do q = 1, num_dof
+                            col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                        end do
+                    end do
+                    j = CSR%rowptr(i+1)-1
+                    adr2 = adr1 + num_dof*(j-CSR%rowptr(i)) 
+                    do q = 1, p
+                        col_expn(adr2+q-1) = num_dof*(CSR%col(j)-1)+q
+                    end do
+                end do
+            end do
+        end select
+
+        CSR%nrows = CSR%nrows * num_dof
+        CSR%ncols = CSR%ncols * num_dof
+
+        call move_alloc( rowptr_expn , CSR%rowptr )
+        call move_alloc( col_expn    , CSR%col    )
+
+        if( allocated(CSR%data) ) deallocate( CSR%data )
+        allocate( CSR%data(CSR%NNZ) , source = zero )
     end subroutine
 
     

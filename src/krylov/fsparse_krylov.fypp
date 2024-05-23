@@ -44,7 +44,7 @@ module fsparse_krylov
 
     interface cgsolve
         #:for ST1 in (SPARSE_TYPES)
-        #:if ST1=="COO" or ST1=="CSR" or ST1=="dense"
+        #:if ST1=="CSR" or ST1=="dense"
         #:for k1, t1, s1 in (KINDS_TYPES)
         module subroutine cgsolve_${ST1}$_${s1}$(A,b,x,di,rtol,maxiter,restart)
             #:if ST1 == "dense"
@@ -132,7 +132,7 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         ${t1}$, intent(in) :: y(:)
         r = dot_product(x,y)
     end function
-    
+
     subroutine loc_precond_${s1}$(op,x,y)
         class(linop_${s1}$) :: op
         ${t1}$, intent(in)  :: x(:)
@@ -201,6 +201,8 @@ submodule (fsparse_krylov) fsparse_krylov_${ST1}$
         ! set matrix pointer
         #:if ST1 == "dense"
         op%ptr_${ST1}$_${s1}$%data => A(:,:)
+        op%ptr_${ST1}$_${s1}$%nrows = size(A,dim=1)
+        op%ptr_${ST1}$_${s1}$%ncols = size(A,dim=2)
         #:else 
         op%ptr_${ST1}$_${s1}$ => A
         #:endif
