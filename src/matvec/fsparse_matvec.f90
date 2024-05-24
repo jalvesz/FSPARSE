@@ -1176,7 +1176,7 @@ contains
 
     contains
     pure subroutine chunk_kernel_4(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(sp), intent(in)  :: a(4,nz), x(*)
         integer, intent(in) :: ja(4,nz)
         real(sp), intent(out) :: y(4)
@@ -1186,7 +1186,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_8(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(sp), intent(in)  :: a(8,nz), x(*)
         integer, intent(in) :: ja(8,nz)
         real(sp), intent(out) :: y(8)
@@ -1196,7 +1196,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_16(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(sp), intent(in)  :: a(16,nz), x(*)
         integer, intent(in) :: ja(16,nz)
         real(sp), intent(out) :: y(16)
@@ -1207,7 +1207,7 @@ contains
     end subroutine
 
     pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
-        integer, value      :: nz, cs, rm
+        integer, intent(in), value      :: nz, cs, rm
         real(sp), intent(in)  :: a(cs,nz), x(*)
         integer, intent(in) :: ja(cs,nz)
         real(sp), intent(out) :: y(rm)
@@ -1270,7 +1270,7 @@ contains
 
     contains
     pure subroutine chunk_kernel_4(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(dp), intent(in)  :: a(4,nz), x(*)
         integer, intent(in) :: ja(4,nz)
         real(dp), intent(out) :: y(4)
@@ -1280,7 +1280,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_8(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(dp), intent(in)  :: a(8,nz), x(*)
         integer, intent(in) :: ja(8,nz)
         real(dp), intent(out) :: y(8)
@@ -1290,7 +1290,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_16(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         real(dp), intent(in)  :: a(16,nz), x(*)
         integer, intent(in) :: ja(16,nz)
         real(dp), intent(out) :: y(16)
@@ -1301,7 +1301,7 @@ contains
     end subroutine
 
     pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
-        integer, value      :: nz, cs, rm
+        integer, intent(in), value      :: nz, cs, rm
         real(dp), intent(in)  :: a(cs,nz), x(*)
         integer, intent(in) :: ja(cs,nz)
         real(dp), intent(out) :: y(rm)
@@ -1364,7 +1364,7 @@ contains
 
     contains
     pure subroutine chunk_kernel_4(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(sp), intent(in)  :: a(4,nz), x(*)
         integer, intent(in) :: ja(4,nz)
         complex(sp), intent(out) :: y(4)
@@ -1374,7 +1374,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_8(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(sp), intent(in)  :: a(8,nz), x(*)
         integer, intent(in) :: ja(8,nz)
         complex(sp), intent(out) :: y(8)
@@ -1384,7 +1384,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_16(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(sp), intent(in)  :: a(16,nz), x(*)
         integer, intent(in) :: ja(16,nz)
         complex(sp), intent(out) :: y(16)
@@ -1395,7 +1395,7 @@ contains
     end subroutine
 
     pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
-        integer, value      :: nz, cs, rm
+        integer, intent(in), value      :: nz, cs, rm
         complex(sp), intent(in)  :: a(cs,nz), x(*)
         integer, intent(in) :: ja(cs,nz)
         complex(sp), intent(out) :: y(rm)
@@ -1458,7 +1458,7 @@ contains
 
     contains
     pure subroutine chunk_kernel_4(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(dp), intent(in)  :: a(4,nz), x(*)
         integer, intent(in) :: ja(4,nz)
         complex(dp), intent(out) :: y(4)
@@ -1468,7 +1468,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_8(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(dp), intent(in)  :: a(8,nz), x(*)
         integer, intent(in) :: ja(8,nz)
         complex(dp), intent(out) :: y(8)
@@ -1478,7 +1478,7 @@ contains
         end do
     end subroutine
     pure subroutine chunk_kernel_16(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         complex(dp), intent(in)  :: a(16,nz), x(*)
         integer, intent(in) :: ja(16,nz)
         complex(dp), intent(out) :: y(16)
@@ -1489,7 +1489,7 @@ contains
     end subroutine
 
     pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
-        integer, value      :: nz, cs, rm
+        integer, intent(in), value      :: nz, cs, rm
         complex(dp), intent(in)  :: a(cs,nz), x(*)
         integer, intent(in) :: ja(cs,nz)
         complex(dp), intent(out) :: y(rm)

@@ -241,7 +241,7 @@ contains
     contains
     #:for chunk in CHUNKS
     pure subroutine chunk_kernel_${chunk}$(nz,a,ja,x,y)
-        integer, value      :: nz
+        integer, intent(in), value      :: nz
         ${t1}$, intent(in)  :: a(${chunk}$,nz), x(*)
         integer, intent(in) :: ja(${chunk}$,nz)
         ${t1}$, intent(out) :: y(${chunk}$)
@@ -253,7 +253,7 @@ contains
     #:endfor
 
     pure subroutine chunk_kernel_remainder(nz,cs,rm,a,ja,x,y)
-        integer, value      :: nz, cs, rm
+        integer, intent(in), value      :: nz, cs, rm
         ${t1}$, intent(in)  :: a(cs,nz), x(*)
         integer, intent(in) :: ja(cs,nz)
         ${t1}$, intent(out) :: y(rm)
