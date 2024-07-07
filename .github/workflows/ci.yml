@@ -46,9 +46,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup oneAPI envs
-        if: matrix.os == 'ubuntu-latest' && matrix.toolchain.compiler == 'intel'
-        - run: |
-            source /opt/intel/oneapi/setvars.sh
+        if: ${{(matrix.os=='ubuntu-latest') && (matrix.toolchain.compiler=='intel')}}
+        run: |
+          source /opt/intel/oneapi/setvars.sh
         
       - run: |
           fpm test --flag "${{ join(matrix.toolchain.flags, ' ') }}"
