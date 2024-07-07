@@ -50,7 +50,7 @@ jobs:
         if: ${{(matrix.os=='ubuntu-latest') && (matrix.toolchain.compiler=='intel')}}
         run: |
           sudo apt-get install intel-oneapi-mkl
-          source /opt/intel/oneapi/setvars.sh
+          source --force /opt/intel/oneapi/setvars.sh intel64
         
       - run: |
           fpm test --flag "${{ join(matrix.toolchain.flags, ' ') }}"
