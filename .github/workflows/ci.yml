@@ -45,10 +45,10 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup oneAPI envs
+      - name: Install Intel MKL
+        timeout-minutes: 5
         if: ${{(matrix.os=='ubuntu-latest') && (matrix.toolchain.compiler=='intel')}}
-        run: |
-          source /opt/intel/oneapi/setvars.sh
+        run: sudo apt-get install intel-oneapi-mkl
         
       - run: |
           fpm test --flag "${{ join(matrix.toolchain.flags, ' ') }}"
