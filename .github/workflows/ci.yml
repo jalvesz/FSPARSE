@@ -48,7 +48,9 @@ jobs:
       - name: Install Intel MKL
         timeout-minutes: 5
         if: ${{(matrix.os=='ubuntu-latest') && (matrix.toolchain.compiler=='intel')}}
-        run: sudo apt-get install intel-oneapi-mkl
+        run: |
+          sudo apt-get install intel-oneapi-mkl
+          source /opt/intel/oneapi/setvars.sh
         
       - run: |
           fpm test --flag "${{ join(matrix.toolchain.flags, ' ') }}"
